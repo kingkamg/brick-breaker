@@ -2,18 +2,12 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        controller: {
-            default: null,
-            type: cc.Node
-        },
         velocity: new cc.Vec2()
     },
 
     onLoad() {
         const manager = cc.director.getCollisionManager();
         manager.enabled = true;
-        manager.enabledDebugDraw = true;
-        manager.enabledDrawBoundingBox = true;
     },
 
     start() {
@@ -21,7 +15,7 @@ cc.Class({
     },
 
     update(dt) {
-        if (this.controller.getComponent("interaction").isGameRunning()) {
+        if (window.controller.isGameRunning()) {
             const dx = this.velocity.x * dt;
             const dy = this.velocity.y * dt;
             this.node.x += dx;
@@ -30,25 +24,42 @@ cc.Class({
     },
 
     onCollisionEnter(other, self) {
-        console.log("on collision enter");
-
-        // 碰撞系统会计算出碰撞组件在世界坐标系下的相关的值，并放到 world 这个属性里面
-        const world = self.world;
-
-        // 碰撞组件的 aabb 碰撞框
-        const aabb = world.aabb;
-
-        // 上一次计算的碰撞组件的 aabb 碰撞框
-        const preAabb = world.preAabb;
-
-        // 碰撞框的世界矩阵
-        const t = world.transform;
-
-        // 以下属性为圆形碰撞组件特有属性
-        const r = world.radius;
-        const p = world.position;
-
-        // 以下属性为 矩形 和 多边形 碰撞组件特有属性
-        const ps = world.points;
+        const sp = self.world.position;
+        const ops = other.world.points;
+        let normal = new cc.Vec2(0, 1);
+        if (sp.x < ops[0].x) {
+            if (sp.y < ops[1].y) {
+                // bottom left
+                normal = new cc.Vec2(sp.x - ops[1].x, sp.y - ops[1].y);
+            } else if (sp.y <= ops[0].y) {
+                // left
+                normal = new cc.Vec2(-1, 0);
+            } else {
+                // top left
+                normal = new cc.Vec2(sp.x - ops[0].x, sp.y - ops[0].y);
+            }
+        } else if (sp.x <= ops[3].x) {
+            if (sp.y < ops[1].y) {
+                // down
+                normal = new cc.Vec2(0, -1);
+            } else {
+                // up
+                normal = new cc.Vec2(0, 1);
+            }
+        } else {
+            if (sp.y < ops[1].y) {
+                // bottom right
+                normal = new cc.Vec2(sp.x - ops[2].x, sp.y - ops[2].y);
+            } else if (sp.y <= ops[0].y) {
+                // right
+                normal = new cc.Vec2(1, 0);
+            } else {
+                // top right
+                normal = new cc.Vec2(sp.x - ops[3].x, sp.y - ops[3].y);
+            }
+        }
+        normal.normalizeSelf();
+        const reflection = this.velocity.sub(normal.mulSelf(2 * normal.dot(this.velocity)));
+        this.velocity = reflection;
     }
 });

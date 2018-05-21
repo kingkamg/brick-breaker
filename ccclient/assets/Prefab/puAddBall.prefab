@@ -10,7 +10,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "brick",
+    "_name": "puAddBall",
     "_objFlags": 0,
     "_parent": null,
     "_children": [
@@ -60,8 +60,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -320,
-      "y": -36
+      "x": 5,
+      "y": -35
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -154,7 +154,7 @@
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "7174d168-73ac-4fd7-a963-a70d567a35ef"
+      "__uuid__": "452ac7d7-57f0-4fdd-a372-fcc83e6225cb"
     },
     "fileId": "6cyLfejWpJAKQniJFcPMoE",
     "sync": false
@@ -227,7 +227,7 @@
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "7174d168-73ac-4fd7-a963-a70d567a35ef"
+      "__uuid__": "452ac7d7-57f0-4fdd-a372-fcc83e6225cb"
     },
     "fileId": "0eYmSe4dhDzITKoIPrPmVy",
     "sync": false

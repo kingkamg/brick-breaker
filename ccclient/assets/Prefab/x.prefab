@@ -10,7 +10,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "bullet",
+    "_name": "x",
     "_objFlags": 0,
     "_parent": null,
     "_children": [],
@@ -19,16 +19,10 @@
     "_components": [
       {
         "__id__": 2
-      },
-      {
-        "__id__": 3
-      },
-      {
-        "__id__": 4
       }
     ],
     "_prefab": {
-      "__id__": 5
+      "__id__": 3
     },
     "_id": "",
     "_opacity": 255,
@@ -47,8 +41,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 30,
-      "height": 30
+      "width": 5,
+      "height": 5
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -56,15 +50,15 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 0,
-      "y": -367
+      "x": 526,
+      "y": 523
     },
     "_skewX": 0,
     "_skewY": 0,
     "_localZOrder": 0,
     "_globalZOrder": 0,
     "_opacityModifyRGB": false,
-    "groupIndex": 1
+    "groupIndex": 0
   },
   {
     "__type__": "cc.Sprite",
@@ -75,7 +69,7 @@
     },
     "_enabled": true,
     "_spriteFrame": {
-      "__uuid__": "5c045eb7-f058-4ec8-8a6f-ba508760d280"
+      "__uuid__": "5c98a47b-8702-4785-96ef-b582b4ea0c8c"
     },
     "_type": 0,
     "_sizeMode": 1,
@@ -93,44 +87,14 @@
     "_atlas": null
   },
   {
-    "__type__": "85879m++45CJKtc5P6zd9Z1",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "velocity": {
-      "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 800
-    }
-  },
-  {
-    "__type__": "cc.CircleCollider",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "tag": 0,
-    "_offset": {
-      "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 0
-    },
-    "_radius": 15
-  },
-  {
     "__type__": "cc.PrefabInfo",
     "root": {
       "__id__": 1
     },
     "asset": {
-      "__uuid__": "56814b38-34c0-4265-b271-f356d15e8f7f"
+      "__uuid__": "ec0706b5-a4be-4bdd-a766-3d75d8f91b04"
     },
-    "fileId": "806s7tdaVNG6NF4jMGdnVx",
+    "fileId": "5eq7Dkx+RK0Y4enLwtnHza",
     "sync": false
   }
 ]

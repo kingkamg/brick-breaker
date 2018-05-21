@@ -6,9 +6,9 @@ cc.Class({
             default: null,
             type: cc.Node
         },
-        bullets: {
-            default: [],
-            type: [cc.Node]
+        canvas: {
+            default: null,
+            type: cc.Node
         }
     },
 
@@ -22,6 +22,8 @@ cc.Class({
                 this.gameRunning = true;
             }
         });
+        window.canvas = this.canvas;
+        window.controller = this;
     },
 
     isGameRunning() {
