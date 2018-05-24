@@ -17,7 +17,7 @@ cc.Class({
     kaboom() {
         const explosion = cc.instantiate(this.boom);
         explosion.getComponent(cc.ParticleSystem).startColor = this.node.color;
-        window.canvas.addChild(explosion);
+        window.controller.canvas.addChild(explosion);
         explosion.x = this.node.x;
         explosion.y = this.node.y;
         this.node.destroy();

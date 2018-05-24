@@ -22,6 +22,12 @@ cc.Class({
     },
 
     setLengthz(val) {
+        if (val < 90) {
+            val = 90;
+        }
+        if (val > 420) {
+            val = 420;
+        }
         this.lengthz = val;
         this.left.x = (this.lengthz - 30) * -0.5;
         this.right.x = (this.lengthz - 30) * 0.5;

@@ -12,12 +12,10 @@ cc.Class({
         this.node.getComponent("brick").kaboom();
         
         const newBullet = cc.instantiate(this.bullet);
-        window.canvas.addChild(newBullet);
+        window.controller.canvas.addChild(newBullet);
         newBullet.x = this.node.x;
         newBullet.y = this.node.y;
-        // const bulletBehaviour = newBullet.getComponent("bullet");
-        // bulletBehaviour.velocity = ball.node.getComponent("bullet").velocity.clone();
-        // const collider = 
+        window.controller.bullets.push(newBullet);
     }
 
 });
