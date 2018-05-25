@@ -19,7 +19,10 @@ cc.Class({
     },
 
     update(dt) {
-        if (window.controller.isGameRunning()) {
+        if (this.sticked === true) {
+            this.node.x = window.controller.player.x;
+            this.node.y = window.controller.player.y + 32;
+        } else {
             const dx = this.velocity.x * dt;
             const dy = this.velocity.y * dt;
             this.node.x += dx;
@@ -28,19 +31,20 @@ cc.Class({
                 const index = window.controller.bullets.indexOf(this.node);
                 if (index != -1) {
                     window.controller.bullets.splice(index, 1);
+                    console.warn(`bullet removed from list, now size = ${window.controller.bullets.length}`);
                 } else {
                     console.warn("bullets not in controller");
                 }
                 this.node.destroy();
+                window.controller.updateAllStickState();
                 console.log("destroyed");
             }
-
-            if (this.launchTime > 0) {
-                this.launchTime -= dt;
-                if (this.launchTime <= 0) {
-                    this.sticked = false;
-                    this.velocity = new cc.Vec2(this.savedx, this.savedy);
-                }
+        }
+        if (this.launchTime > 0) {
+            this.launchTime -= dt;
+            if (this.launchTime <= 0) {
+                this.sticked = false;
+                this.velocity = new cc.Vec2(this.savedx, this.savedy);
             }
         }
     },
@@ -48,6 +52,7 @@ cc.Class({
     freeze() {
         this.velocity = new cc.Vec2(0, 0);
         this.sticked = true;
+        window.controller.updateAllStickState();
     },
 
     launchIn(x, y, time) {
