@@ -31,13 +31,12 @@ cc.Class({
                 const index = window.controller.bullets.indexOf(this.node);
                 if (index != -1) {
                     window.controller.bullets.splice(index, 1);
-                    console.warn(`bullet removed from list, now size = ${window.controller.bullets.length}`);
+                    console.log(`bullet removed from list, now size = ${window.controller.bullets.length}`);
                 } else {
                     console.warn("bullets not in controller");
                 }
                 this.node.destroy();
                 window.controller.updateAllStickState();
-                console.log("destroyed");
             }
         }
         if (this.launchTime > 0) {

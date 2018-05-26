@@ -5438,7 +5438,9 @@
         "__id__": 175
       }
     ],
-    "allSticked": true
+    "allSticked": true,
+    "touchPressed": false,
+    "touchLoc": null
   },
   {
     "__type__": "cc.Canvas",
