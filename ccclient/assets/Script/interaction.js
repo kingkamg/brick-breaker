@@ -22,6 +22,10 @@ cc.Class({
             default: [],
             type: [cc.Node]
         },
+        levelContainer: {
+            default: null,
+            type: cc.Node
+        },
         score: {
             default: null,
             type: cc.Label
@@ -136,7 +140,7 @@ cc.Class({
             }
             if (brick != null) {
                 this.bricks.push(brick);
-                window.controller.canvas.addChild(brick);
+                this.levelContainer.addChild(brick);
                 brick.x = -314 + i * 90;
                 brick.y = 430;
             }
