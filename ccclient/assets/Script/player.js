@@ -15,10 +15,18 @@ cc.Class({
             default: null,
             type: cc.Node
         },
+        number: {
+            default: null,
+            type: cc.Label
+        },
     },
 
     start() {
 
+    },
+
+    updateNumber(val) {
+        this.number.string = "" + val;
     },
 
     setLengthz(val) {

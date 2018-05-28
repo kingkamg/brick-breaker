@@ -29,10 +29,13 @@
       },
       {
         "__id__": 7
+      },
+      {
+        "__id__": 8
       }
     ],
     "_prefab": {
-      "__id__": 8
+      "__id__": 9
     },
     "_id": "",
     "_opacity": 255,
@@ -51,8 +54,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 76,
-      "height": 30
+      "width": 86,
+      "height": 86
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -60,8 +63,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -320,
-      "y": -36
+      "x": -240,
+      "y": 430
     },
     "_skewX": 0,
     "_skewY": 0,
@@ -105,8 +108,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 27,
-      "height": 24
+      "width": 40,
+      "height": 36
     },
     "_rotationX": 0,
     "_rotationY": 0,
@@ -133,9 +136,9 @@
     },
     "_enabled": true,
     "_useOriginalSize": false,
-    "_actualFontSize": 24,
-    "_fontSize": 24,
-    "_lineHeight": 24,
+    "_actualFontSize": 36,
+    "_fontSize": 36,
+    "_lineHeight": 36,
     "_enableWrapText": true,
     "_N$file": {
       "__uuid__": "6aee35fd-6723-4932-9a7d-13c268be20a7"
@@ -196,10 +199,7 @@
     "boom": {
       "__uuid__": "132907b0-0767-45a8-91c5-3c105f2b0792"
     },
-    "hp": 2,
-    "number": {
-      "__id__": 3
-    }
+    "brickType": "brickNormal"
   },
   {
     "__type__": "cc.BoxCollider",
@@ -217,8 +217,21 @@
     },
     "_size": {
       "__type__": "cc.Size",
-      "width": 76,
-      "height": 30
+      "width": 86,
+      "height": 86
+    }
+  },
+  {
+    "__type__": "f2d179AkLFEVbxLjeVWNRlR",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "hp": 3,
+    "number": {
+      "__id__": 3
     }
   },
   {

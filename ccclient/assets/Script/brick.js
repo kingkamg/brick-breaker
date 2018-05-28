@@ -20,10 +20,17 @@ cc.Class({
         window.controller.canvas.addChild(explosion);
         explosion.x = this.node.x;
         explosion.y = this.node.y;
+        const index = window.controller.bricks.indexOf(this.node);
+        if (index != -1) {
+            window.controller.bricks.splice(index, 1);
+        } else {
+            console.warn("Removing inexisting brick");
+        }
         this.node.destroy();
     },
 
     onCollisionEnter(other, self) {
+        window.controller.addScore(1);
         this.node.getComponent(this.brickType).takeHit(other);
     }
 

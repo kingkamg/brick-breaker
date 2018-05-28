@@ -114,7 +114,7 @@
     },
     "_angle": 90,
     "_angleVar": 20,
-    "_startSize": 5,
+    "_startSize": 10,
     "_startSizeVar": 0,
     "_endSize": 5,
     "_endSizeVar": 0,
@@ -129,8 +129,8 @@
     },
     "_posVar": {
       "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 10
+      "x": 50,
+      "y": 50
     },
     "_positionType": 0,
     "_emitterMode": 0,
@@ -147,10 +147,10 @@
     "_radialAccelVar": 0,
     "_rotationIsDir": false,
     "_startRadius": 30,
-    "_startRadiusVar": 30,
-    "_endRadius": 100,
-    "_endRadiusVar": 100,
-    "_rotatePerS": 35,
+    "_startRadiusVar": 50,
+    "_endRadius": 80,
+    "_endRadiusVar": 120,
+    "_rotatePerS": 0,
     "_rotatePerSVar": 0,
     "_N$preview": true
   },

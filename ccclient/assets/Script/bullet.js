@@ -7,6 +7,7 @@ cc.Class({
         launchTime: -1,
         savedx: 0,
         savedy: 0,
+        uselessCollide: 0
     },
 
     onLoad() {
@@ -27,11 +28,10 @@ cc.Class({
             const dy = this.velocity.y * dt;
             this.node.x += dx;
             this.node.y += dy;
-            if (this.node.y < -670) {
+            if (this.node.y < -670 || this.node.y > 560 || this.node.x < -370 || this.node.x > 370) {
                 const index = window.controller.bullets.indexOf(this.node);
                 if (index != -1) {
                     window.controller.bullets.splice(index, 1);
-                    console.log(`bullet removed from list, now size = ${window.controller.bullets.length}`);
                 } else {
                     console.warn("bullets not in controller");
                 }
@@ -44,6 +44,7 @@ cc.Class({
             if (this.launchTime <= 0) {
                 this.sticked = false;
                 this.velocity = new cc.Vec2(this.savedx, this.savedy);
+                window.controller.updateAllStickState();
             }
         }
     },
@@ -68,6 +69,14 @@ cc.Class({
         const p1 = new cc.Vec2(ops[1].x + 15, ops[1].y);
         const p2 = new cc.Vec2(ops[2].x - 15, ops[2].y);
         const p3 = new cc.Vec2(ops[3].x - 15, ops[3].y);
+        if (other.tag == 0) {
+            this.uselessCollide = 0;
+        } else if (other.tag == 1) {
+            this.uselessCollide += 1;
+            if (this.uselessCollide > 7) {
+                this.velocity.y += 300;
+            }
+        }
         if (sp.x < p0.x) {
             if (sp.y < p1.y) {
                 // bottom left

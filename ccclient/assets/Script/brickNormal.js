@@ -15,6 +15,13 @@ cc.Class({
 
     updateHP() {
         this.number.string = "" + this.hp;
+        const index = Math.floor(this.hp / 4);
+        const ratio = (4 - this.hp % 4) / 4.0;
+        let target = new cc.color(255, 255, 255);
+        if (index > 0) {
+            target = window.controller.colors[index - 1];
+        }
+        this.node.color = window.controller.colors[index].lerp(target, ratio);
     },
 
     takeHit(ball) {
