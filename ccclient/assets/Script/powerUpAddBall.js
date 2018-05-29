@@ -16,7 +16,9 @@ cc.Class({
         window.controller.canvas.addChild(newBullet);
         newBullet.x = this.node.x;
         newBullet.y = this.node.y;
-        newBullet.getComponent("bullet").velocity = ball.getComponent("bullet").velocity.clone();
+        const bulletBehaviour = newBullet.getComponent("bullet");
+        bulletBehaviour.velocity = ball.getComponent("bullet").velocity.clone();
+        bulletBehaviour.sticked = false;
         window.controller.bullets.push(newBullet);
     }
 

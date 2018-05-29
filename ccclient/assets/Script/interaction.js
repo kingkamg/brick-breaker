@@ -95,6 +95,15 @@ cc.Class({
 
     gameEnd() {
         this.gameOver.active = true;
+
+        if (typeof (FBInstant) != "undefined") {
+            FBInstant.getLeaderboardAsync("highscore").then((leaderboard) => {
+                console.log(leaderboard.getName());
+                console.log(leaderboard.getContextID());
+            }, (rejected) => {
+                console.log(rejected);
+            });
+        }
     },
 
     addOneLevel() {

@@ -1270,7 +1270,7 @@
       "__uuid__": "5c045eb7-f058-4ec8-8a6f-ba508760d280"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -1487,7 +1487,7 @@
       "__uuid__": "5c045eb7-f058-4ec8-8a6f-ba508760d280"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -1706,7 +1706,7 @@
       "__uuid__": "5c045eb7-f058-4ec8-8a6f-ba508760d280"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -2068,7 +2068,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 720,
+      "width": 940,
       "height": 1280
     },
     "_rotationX": 0,

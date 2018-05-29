@@ -78,7 +78,7 @@
       "__uuid__": "5c045eb7-f058-4ec8-8a6f-ba508760d280"
     },
     "_type": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
@@ -105,10 +105,10 @@
     },
     "velocity": {
       "__type__": "cc.Vec2",
-      "x": 0,
+      "x": -100,
       "y": 800
     },
-    "sticked": false,
+    "sticked": true,
     "launchTime": -1,
     "savedx": 0,
     "savedy": 0,
