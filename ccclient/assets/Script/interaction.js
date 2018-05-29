@@ -30,6 +30,10 @@ cc.Class({
             default: null,
             type: cc.Label
         },
+        gameOver: {
+            default: null,
+            type: cc.Node
+        },
         state: "ready", // ready, moving
         allSticked: true,
         touchPressed: false,
@@ -89,11 +93,22 @@ cc.Class({
         this.score.string = this.scoreValue + "";
     },
 
+    gameEnd() {
+        this.gameOver.active = true;
+    },
+
     addOneLevel() {
         // move downward
+        let lowest = 1000;
         for (let i = 0; i < this.bricks.length; i++) {
             const element = this.bricks[i];
             element.y -= 100;
+            if (element.y < lowest) {
+                lowest = element.y
+            }
+        }
+        if (lowest < -270) {
+            this.gameEnd();
         }
         // add one layer
         let n = this.bricksPool[Math.floor(Math.random() * this.bricksPool.length)];
@@ -195,19 +210,23 @@ cc.Class({
     },
 
     updateAllStickState() {
-        let count = 0;
-        for (let i = 0; i < this.bullets.length; i++) {
-            if (this.bullets[i].getComponent("bullet").sticked === true) {
-                count += 1;
+        if (this.bullets.length == 0) {
+            this.gameEnd();
+        } else {
+            let count = 0;
+            for (let i = 0; i < this.bullets.length; i++) {
+                if (this.bullets[i].getComponent("bullet").sticked === true) {
+                    count += 1;
+                }
             }
-        }
-        this.player.getComponent("player").updateNumber(count);
-        if (this.maxBalls < count) {
-            this.maxBalls = count;
-        }
-        if (count === this.bullets.length) {
-            this.allSticked = true;
-            this.addOneLevel();
+            this.player.getComponent("player").updateNumber(count);
+            if (this.maxBalls < count) {
+                this.maxBalls = count;
+            }
+            if (count === this.bullets.length) {
+                this.allSticked = true;
+                this.addOneLevel();
+            }
         }
     }
 

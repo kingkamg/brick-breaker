@@ -2,6 +2,10 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
+        sound: {
+            url: cc.AudioClip,
+            default: null
+        },
         velocity: new cc.Vec2(),
         sticked: false,
         launchTime: -1,
@@ -13,10 +17,6 @@ cc.Class({
     onLoad() {
         const manager = cc.director.getCollisionManager();
         manager.enabled = true;
-    },
-
-    start() {
-
     },
 
     update(dt) {
@@ -62,6 +62,8 @@ cc.Class({
     },
 
     onCollisionEnter(other, self) {
+        cc.audioEngine.play(this.sound, false, 1);
+        
         const sp = self.world.position;
         const ops = other.world.points;
         let normal = new cc.Vec2(0, 1);
