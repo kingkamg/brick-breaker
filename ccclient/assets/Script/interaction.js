@@ -97,9 +97,23 @@ cc.Class({
         this.gameOver.active = true;
 
         if (typeof (FBInstant) != "undefined") {
-            FBInstant.getLeaderboardAsync("highscore").then((leaderboard) => {
+            FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`).then((leaderboard) => {
                 console.log(leaderboard.getName());
                 console.log(leaderboard.getContextID());
+            }, (rejected) => {
+                console.log(rejected);
+            });
+
+            FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`).then((leaderboard) => {
+                leaderboard.getPlayerEntryAsync().then((entry) => {
+                    leaderboard.setScoreAsync(this.scoreValue).then(() => {
+                        console.log(`${highscore} score saved ${this.scoreValue}`);
+                    }, (rejected) => {
+                        console.log(rejected);
+                    });
+                }, (rejected) => {
+                    console.log(rejected);
+                });
             }, (rejected) => {
                 console.log(rejected);
             });

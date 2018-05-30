@@ -13,7 +13,7 @@ cc.Class({
     },
 
     onLeaderboardClicked() {
-        this.leaderboardPage.active = true;
+        this.leaderboardPage.getComponent("leaderboard").show();
     },
 
     onLeaderboardDismiss() {
