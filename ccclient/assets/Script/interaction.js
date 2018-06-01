@@ -38,6 +38,10 @@ cc.Class({
         allSticked: true,
         touchPressed: false,
         touchLoc: null,
+        bulletPrefab: {
+            default: null,
+            type: cc.Prefab
+        },
         brickPrefab: {
             default: null,
             type: cc.Prefab
@@ -60,8 +64,7 @@ cc.Class({
             4, 4, 4, 4, 4, 4, 4, 4,
             5, 5, 5, 5, 5,
             6, 6, 6,
-            7, 7,
-            8,
+            7,
         ];
         this.colors = [
             new cc.color(241, 196, 15),
@@ -88,6 +91,42 @@ cc.Class({
         this.addScore(0);
     },
 
+    restart() {
+        console.log("restat game");
+        this.gameOver.active = false;
+        let brick = this.bricks.pop();
+        while (brick != undefined) {
+            brick.destroy();
+            brick = this.bricks.pop();
+        }
+        brick = this.bullets.pop();
+        while (brick != undefined) {
+            brick.destroy();
+            brick = this.bullets.pop();
+        }
+        this.player.x = 0;
+        this.player.y = -400;
+
+        const newBullet = cc.instantiate(this.bulletPrefab);
+        this.canvas.addChild(newBullet);
+        newBullet.x = 0;
+        newBullet.y = -367;
+        const bulletBehaviour = newBullet.getComponent("bullet");
+        bulletBehaviour.sticked = true;
+        this.bullets.push(newBullet);
+
+        this.allSticked = true;
+        this.state = "ready";
+        this.maxBalls = 1;
+        this.updateAllStickState();
+        this.setScore(0);
+    },
+
+    setScore(val) {
+        this.scoreValue = val;
+        this.score.string = this.scoreValue + "";
+    },
+
     addScore(val) {
         this.scoreValue += val;
         this.score.string = this.scoreValue + "";
@@ -97,16 +136,19 @@ cc.Class({
         this.gameOver.active = true;
 
         if (typeof (FBInstant) != "undefined") {
-            FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`).then((leaderboard) => {
-                console.log(leaderboard.getName());
-                console.log(leaderboard.getContextID());
-            }, (rejected) => {
-                console.log(rejected);
-            });
-
-            FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`).then((leaderboard) => {
+            console.log(`current context = ${FBInstant.context.getID()}`);
+            let leaderboardPromise;
+            if (FBInstant.context.getID() == null) {
+                leaderboardPromise = FBInstant.getLeaderboardAsync("global_highscore");
+            } else {
+                leaderboardPromise = FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`);
+            }
+            leaderboardPromise.then((leaderboard) => {
+                console.log("update score, getLeaderboardAsync OK");
                 leaderboard.getPlayerEntryAsync().then((entry) => {
+                    console.log("update score, getPlayerEntryAsync OK");
                     leaderboard.setScoreAsync(this.scoreValue).then(() => {
+                        console.log("update score, setScoreAsync OK");
                         console.log(`${highscore} score saved ${this.scoreValue}`);
                     }, (rejected) => {
                         console.log(rejected);

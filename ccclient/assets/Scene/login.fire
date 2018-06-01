@@ -1702,6 +1702,9 @@
       "__id__": 27
     },
     "_enabled": true,
+    "boardName": {
+      "__id__": 42
+    },
     "container": {
       "__id__": 36
     },

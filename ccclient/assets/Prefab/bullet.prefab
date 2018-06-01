@@ -105,8 +105,8 @@
     },
     "velocity": {
       "__type__": "cc.Vec2",
-      "x": -100,
-      "y": 800
+      "x": 0,
+      "y": 0
     },
     "sticked": true,
     "launchTime": -1,

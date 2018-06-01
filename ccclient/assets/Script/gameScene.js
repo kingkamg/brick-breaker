@@ -7,4 +7,8 @@ cc.Class({
     onExitClicked() {
         cc.director.loadScene("login");
     },
+
+    onRestartClicked() {
+        window.controller.restart();
+    }
 });
