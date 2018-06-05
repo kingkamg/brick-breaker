@@ -5,6 +5,7 @@ cc.Class({
     },
 
     onExitClicked() {
+        window.controller.updateScore();
         cc.director.loadScene("login");
     },
 

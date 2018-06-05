@@ -40,7 +40,7 @@ cc.Class({
                     this.container.height = 108 * entries.length + 50;
                     for (let i = 0; i < entries.length; i++) {
                         const scoreEntry = cc.instantiate(this.scoreEntryPrefab);
-                        scoreEntry.getComponent("scoreBehaviour").setValues(entries[i].getPlayer().getName(), entries[i].getScore(), entries[i].getRank());
+                        scoreEntry.getComponent("scoreBehaviour").setValues(entries[i].getPlayer().getName(), entries[i].getScore(), entries[i].getRank(), entries[i].getPlayer().getPhoto());
                         this.container.addChild(scoreEntry);
                         scoreEntry.y = -80 - 108 * i;
                         scoreEntry.x = 0;

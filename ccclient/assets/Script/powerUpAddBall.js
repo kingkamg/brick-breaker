@@ -5,6 +5,10 @@ cc.Class({
         bullet: {
             default: null,
             type: cc.Prefab
+        },
+        plusOne: {
+            default: null,
+            type: cc.Prefab
         }
     },
 
@@ -20,7 +24,12 @@ cc.Class({
         bulletBehaviour.velocity = ball.getComponent("bullet").velocity.clone();
         bulletBehaviour.sticked = false;
         window.controller.bullets.push(newBullet);
+
+        // visual effect + 1
+        const visualPlus1 = cc.instantiate(this.plusOne);
+        window.controller.canvas.addChild(visualPlus1);
+        visualPlus1.x = this.node.x;
+        visualPlus1.y = this.node.y + 40;
     }
 
 });
-    

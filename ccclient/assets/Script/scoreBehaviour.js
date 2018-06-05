@@ -24,7 +24,7 @@ cc.Class({
         },
     },
 
-    setValues(name, score, rank) {
+    setValues(name, score, rank, avatar) {
         this.score.string = score + "";
         this.playerName.string = name + "";
         this.rank.string = rank + "";
@@ -37,6 +37,15 @@ cc.Class({
         } else {
             this.rankBack.color = new cc.color(44, 62, 80);
         }
+
+        cc.loader.load(avatar, (err, tex) => {
+            if (err) {
+                console.log("load avatar failed", err);
+            } else {
+                this.avatarImage.spriteFrame = new cc.SpriteFrame(tex);
+                console.log("setting image");
+            }
+        });
     }
 
 });

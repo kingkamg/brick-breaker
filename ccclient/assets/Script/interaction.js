@@ -30,6 +30,11 @@ cc.Class({
             default: null,
             type: cc.Label
         },
+        scoreBuldge: 0,
+        bestScore: {
+            default: null,
+            type: cc.Label
+        },
         gameOver: {
             default: null,
             type: cc.Node
@@ -89,6 +94,32 @@ cc.Class({
     start() {
         this.addOneLevel();
         this.addScore(0);
+        this.loadBestScore();
+    },
+
+    loadBestScore() {
+        if (typeof (FBInstant) != "undefined") {
+            console.log(`current context = ${FBInstant.context.getID()}`);
+            let leaderboardPromise;
+            if (FBInstant.context.getID() == null) {
+                leaderboardPromise = FBInstant.getLeaderboardAsync("global_highscore");
+            } else {
+                leaderboardPromise = FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`);
+            }
+            leaderboardPromise.then((leaderboard) => {
+                console.log(`get best, getLeaderboardAsync OK`);
+                leaderboard.getPlayerEntryAsync().then((entry) => {
+                    console.log("get best, getPlayerEntryAsync OK", entry);
+                    if (entry !== null) {
+                        this.bestScore.string = "" + entry.getScore();
+                    }
+                }, (rejected) => {
+                    console.log(rejected);
+                });
+            }, (rejected) => {
+                console.log(rejected);
+            });
+        }
     },
 
     restart() {
@@ -130,11 +161,13 @@ cc.Class({
     addScore(val) {
         this.scoreValue += val;
         this.score.string = this.scoreValue + "";
+        this.scoreBuldge = 0.55;
     },
 
-    gameEnd() {
-        this.gameOver.active = true;
-
+    updateScore() {
+        if (this.scoreValue > parseInt(this.bestScore.string)) {
+            this.bestScore.string = "" + this.scoreValue;
+        }
         if (typeof (FBInstant) != "undefined") {
             console.log(`current context = ${FBInstant.context.getID()}`);
             let leaderboardPromise;
@@ -160,6 +193,11 @@ cc.Class({
                 console.log(rejected);
             });
         }
+    },
+
+    gameEnd() {
+        this.gameOver.active = true;
+        this.updateScore();
     },
 
     addOneLevel() {
@@ -231,6 +269,14 @@ cc.Class({
     update(dt) {
         if (this.touchPressed === true && this.allSticked === true && this.state == "ready") {
             this.updateArrow();
+        }
+        if (this.scoreBuldge > 0) {
+            this.scoreBuldge -= dt * dt * 150;
+            if (this.scoreBuldge < 0) {
+                this.scoreBuldge = 0;
+            }
+            this.score.node.scaleX = this.scoreBuldge + 1;
+            this.score.node.scaleY = this.scoreBuldge + 1;
         }
     },
 

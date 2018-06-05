@@ -1041,7 +1041,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 111,
+      "width": 22,
       "height": 40
     },
     "_rotationX": 0,
@@ -1078,7 +1078,7 @@
     },
     "_isSystemFontUsed": false,
     "_spacingX": 0,
-    "_N$string": "55723",
+    "_N$string": "0",
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -2027,6 +2027,10 @@
     },
     "score": {
       "__id__": 29
+    },
+    "scoreBuldge": 0,
+    "bestScore": {
+      "__id__": 27
     },
     "gameOver": {
       "__id__": 58
