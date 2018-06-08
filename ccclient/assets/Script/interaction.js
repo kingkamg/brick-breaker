@@ -39,6 +39,10 @@ cc.Class({
             default: null,
             type: cc.Node
         },
+        guide: {
+            default: null,
+            type: cc.Node
+        },
         state: "ready", // ready, moving
         allSticked: true,
         touchPressed: false,
@@ -83,6 +87,10 @@ cc.Class({
             new cc.color(231, 76, 60),
             new cc.color(192, 57, 43)
         ];
+        this.leaderboardScores = {
+            isContexed: false,
+            scores: []
+        };
 
         this.node.on(cc.Node.EventType.TOUCH_START, this.onDragged.bind(this));
         this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onDragged.bind(this));
@@ -95,6 +103,38 @@ cc.Class({
         this.addOneLevel();
         this.addScore(0);
         this.loadBestScore();
+        this.guide.getComponent("guideBehaviour").phase(1);
+        this.loadLeaderboardScores();
+    },
+
+    loadLeaderboardScores() {
+        if (typeof (FBInstant) != "undefined") {
+            console.log(`current context = ${FBInstant.context.getID()}`);
+            let leaderboardPromise;
+            if (FBInstant.context.getID() == null) {
+                leaderboardPromise = FBInstant.getLeaderboardAsync("global_highscore");
+            } else {
+                leaderboardPromise = FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`);
+                this.leaderboardScores.isContexed = true;
+            }
+            leaderboardPromise.then((leaderboard) => {
+                console.log(`get all scores, getLeaderboardAsync OK`);
+                leaderboard.getEntriesAsync(10, 0).then((entries) => {
+                    console.log("get all scores, getEntriesAsync OK", entries);
+                    this.leaderboardScores.scores = [];
+                    for (let i = 0; i < entries.length; i++) {
+                        this.leaderboardScores.scores.push({
+                            score: entries[i].getScore()
+                        });
+                    }
+                }, (rejected) => {
+                    console.log(rejected);
+                });
+            }, (rejected) => {
+                console.log(rejected);
+            });
+        }
+        console.log(this.leaderboardScores);
     },
 
     loadBestScore() {
@@ -151,6 +191,7 @@ cc.Class({
         this.maxBalls = 1;
         this.updateAllStickState();
         this.setScore(0);
+        this.loadLeaderboardScores();
     },
 
     setScore(val) {
@@ -196,7 +237,27 @@ cc.Class({
     },
 
     gameEnd() {
-        this.gameOver.active = true;
+        let level = 1;
+        if (this.leaderboardScores.isContexed === false) {
+            if (this.scoreValue <= parseInt(this.bestScore.string)) {
+                level = 2;
+            }
+            if (this.scoreValue < 5) {
+                level = 3;
+            }
+        } else {
+            if (this.leaderboardScores.scores.length > 0) {
+                if (this.scoreValue < this.leaderboardScores.scores[0].score) {
+                    level = 2;
+                } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
+                    level = 0;
+                }
+                if (this.scoreValue < 5) {
+                    level = 3;
+                }
+            }
+        }
+        this.gameOver.getComponent("gameOverBehaviour").show(this.leaderboardScores.isContexed, level);
         this.updateScore();
     },
 
@@ -318,6 +379,9 @@ cc.Class({
             this.state = "ready";
         }
         this.touchPressed = false;
+        if (this.guide.getComponent("guideBehaviour").stage === 1) {
+            this.guide.getComponent("guideBehaviour").phase(2);
+        }
     },
 
     updateAllStickState() {
