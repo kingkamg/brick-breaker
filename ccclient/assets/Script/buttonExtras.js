@@ -3,7 +3,7 @@ cc.Class({
 
     properties: {
         sound: {
-            url: cc.AudioClip,
+            type: cc.AudioClip,
             default: null
         }
     },

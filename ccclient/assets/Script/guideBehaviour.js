@@ -48,12 +48,12 @@ cc.Class({
                 this.node.active = true;
                 this.hand.active = true;
                 this.hand.y = 0;
-                this.text.string = "Aim to shoot";
+                this.text.string = "瞄准 - 发射";
                 break;
             case 2:
                 this.node.active = true;
                 this.hand.active = false;
-                this.text.string = "Catch the balls";
+                this.text.string = "接住球球";
                 this.phase2Counter = 4;
                 break;
             default:

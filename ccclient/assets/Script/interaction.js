@@ -64,10 +64,14 @@ cc.Class({
             default: [],
             type: [cc.color]
         },
-        scoreValue: 0
+        scoreValue: 0,
+        gameRunning: false,
+        memScore: 0,
+        currentLevel: 0
     },
 
     onLoad() {
+        cc.debug.setDisplayStats(false);
         this.bricksPool = [
             3, 3, 3, 3, 3,
             4, 4, 4, 4, 4, 4, 4, 4,
@@ -99,12 +103,18 @@ cc.Class({
         window.controller = this;
     },
 
-    start() {
-        this.addOneLevel();
+    startGame() {
         this.addScore(0);
         this.loadBestScore();
         this.guide.getComponent("guideBehaviour").phase(1);
         this.loadLeaderboardScores();
+        this.addOneLevel();
+        this.gameRunning = true;
+        const newBullet = cc.instantiate(this.bulletPrefab);
+        this.bullets.push(newBullet);
+        this.canvas.addChild(newBullet);
+        newBullet.x = this.player.x;
+        newBullet.y = this.player.y + 30;
     },
 
     loadLeaderboardScores() {
@@ -159,11 +169,23 @@ cc.Class({
             }, (rejected) => {
                 console.log(rejected);
             });
+        } else {
+            console.log("read from localstorage")
+            let score = cc.sys.localStorage.getItem("score");
+            if (score !== null && score !== "") {
+                this.bestScore.string = score;
+                this.memScore = parseInt(score, 10);
+            } else {
+                this.bestScore.string = "0";
+            }
         }
     },
 
     restart() {
-        console.log("restat game");
+        console.log("restart game");
+        this.loadBestScore();
+        this.guide.getComponent("guideBehaviour").phase(1);
+        this.gameRunning = true;
         this.gameOver.active = false;
         let brick = this.bricks.pop();
         while (brick != undefined) {
@@ -233,32 +255,57 @@ cc.Class({
             }, (rejected) => {
                 console.log(rejected);
             });
+        } else {
+            console.log("write to localstorage")
+            cc.sys.localStorage.setItem("score", this.memScore.toString());
         }
     },
 
     gameEnd() {
+        if (this.gameRunning === false) return;
         let level = 1;
-        if (this.leaderboardScores.isContexed === false) {
-            if (this.scoreValue <= parseInt(this.bestScore.string)) {
+        if (typeof (FBInstant) != "undefined") {
+            if (this.leaderboardScores.isContexed === false) {
+                if (this.scoreValue <= parseInt(this.bestScore.string)) {
+                    level = 2;
+                }
+                if (this.scoreValue < 5) {
+                    level = 3;
+                }
+            } else {
+                if (this.leaderboardScores.scores.length > 0) {
+                    if (this.scoreValue < this.leaderboardScores.scores[0].score) {
+                        level = 2;
+                    } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
+                        level = 0;
+                    }
+                    if (this.scoreValue < 5) {
+                        level = 3;
+                    }
+                }
+            }
+        } else {
+            if (this.scoreValue <= this.memScore) {
                 level = 2;
             }
             if (this.scoreValue < 5) {
                 level = 3;
             }
-        } else {
-            if (this.leaderboardScores.scores.length > 0) {
-                if (this.scoreValue < this.leaderboardScores.scores[0].score) {
-                    level = 2;
-                } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
-                    level = 0;
-                }
-                if (this.scoreValue < 5) {
-                    level = 3;
-                }
+            if (this.memScore < this.scoreValue) {
+                this.memScore = this.scoreValue;
             }
         }
         this.gameOver.getComponent("gameOverBehaviour").show(this.leaderboardScores.isContexed, level);
         this.updateScore();
+    },
+
+    destroyAllLevels() {
+        let i = this.bricks.length;
+        while (i --) {
+            const elem = this.bricks[i];
+            this.bricks.splice(i, 1)
+            elem.destroy();
+        }
     },
 
     addOneLevel() {
@@ -359,7 +406,7 @@ cc.Class({
 
     onDragged(e) {
         this.touchLoc = e.getLocation();
-        if (this.state == "moving") {
+        if (this.state == "moving" && this.touchPressed == true) {
             this.player.getComponent("player").setPosition(e.getDeltaX());
         }
         this.touchPressed = true;
@@ -400,7 +447,9 @@ cc.Class({
             }
             if (count === this.bullets.length) {
                 this.allSticked = true;
-                this.addOneLevel();
+                if (this.gameRunning === true) {
+                    this.addOneLevel();
+                }
             }
         }
     }

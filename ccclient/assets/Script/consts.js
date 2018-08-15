@@ -1,43 +1,43 @@
 window.gameOverStrings = {
     nullNo1: [
-        "You have reached a new height.",
-        "New highscore."
+        "你又突破了自己！",
+        "新纪录"
     ],
     contextedNo1: [
-        "You have beaten all your friends.",
-        "You are now the new No. 1."
+        "你击败了所有的好友",
+        "你现在是新的王者"
     ],
     contextedOwning: [
-        "Your friends can't get even close.",
-        "You played way better than your friends."
+        "你的好友们完全比不上你",
+        "你比你的好友们玩得好多了"
     ],
     failText: [
-        "Another game.",
-        "Restart game.",
-        "New round."
+        "再来一局",
+        "重新开始",
+        "继续游戏"
     ],
     commentGreat: [
-        "Marvelous!",
-        "Fantastic!",
-        "Awesome!",
-        "Wonderful!",
-        "Great job!"
+        "强无敌！",
+        "太棒了！",
+        "厉害了！",
+        "精彩！",
+        "优秀！"
     ],
     commentGood: [
-        "Good job",
-        "Good game",
-        "Well played",
-        "Not bad"
+        "挺好的",
+        "打得不错",
+        "玩的可以",
+        "还行"
     ],
     commentBad: [
-        "Don't worry",
-        "Come on",
-        "Cheer up",
-        "Don't give up"
+        "没事的啦",
+        "给点力",
+        "加油嘛",
+        "别放弃啊"
     ],
     oks: [
-        "Okay",
-        "OK"
+        "好",
+        "好的"
     ]
 };
 
