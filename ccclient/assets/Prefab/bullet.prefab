@@ -73,7 +73,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 189,
+    "_localZOrder": 376,
     "groupIndex": 1,
     "_id": ""
   },
@@ -103,7 +103,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "99BXEIEbdEDKAHfDqGqRhn"
+    "_id": "fdkN2IqpBOM64fDn4t+dg6"
   },
   {
     "__type__": "85879m++45CJKtc5P6zd9Z1",
@@ -126,7 +126,7 @@
     "savedx": 0,
     "savedy": 0,
     "uselessCollide": 0,
-    "_id": "acFLNSSdNJgJ1Jiyupk1bO"
+    "_id": "efhssXUZNKzZuLSS3pQX9E"
   },
   {
     "__type__": "cc.CircleCollider",
@@ -143,7 +143,7 @@
       "y": 0
     },
     "_radius": 15,
-    "_id": "95s9UD3JhOKYxKO4M3nbT5"
+    "_id": "26WwGrO6ZA4rvn+IyVbKgZ"
   },
   {
     "__type__": "cc.PrefabInfo",

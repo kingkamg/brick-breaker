@@ -25,6 +25,10 @@ cc.Class({
 
     },
 
+    enlarge() {
+        this.setLengthz(this.lengthz + 30);
+    },
+
     updateNumber(val) {
         this.number.string = "" + val;
     },
@@ -33,13 +37,14 @@ cc.Class({
         if (val < 90) {
             val = 90;
         }
-        if (val > 420) {
-            val = 420;
+        if (val > 500) {
+            val = 500;
         }
         this.lengthz = val;
         this.left.x = (this.lengthz - 30) * -0.5;
         this.right.x = (this.lengthz - 30) * 0.5;
         this.center.width = this.lengthz - 30;
+        this.center.getComponent(cc.BoxCollider).size.width = this.lengthz;
     },
 
     setPosition(deltaX) {

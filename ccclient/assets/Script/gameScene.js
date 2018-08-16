@@ -21,6 +21,7 @@ cc.Class({
         this.gameUINode.active = false;
         window.controller.destroyAllLevels();
         window.controller.player.x = 0;
+        window.controller.player.getComponent("player").setLengthz(210)
         window.controller.gameRunning = false;
     }
 

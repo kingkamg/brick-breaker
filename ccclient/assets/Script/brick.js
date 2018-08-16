@@ -32,6 +32,8 @@ cc.Class({
     onCollisionEnter(other, self) {
         window.controller.addScore(1);
         this.node.getComponent(this.brickType).takeHit(other);
+        // move bullet
+        other.node.getComponent("bullet").reflect(other.world.position, self.world.points)
     }
 
 });

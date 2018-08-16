@@ -59,6 +59,14 @@ cc.Class({
             default: null,
             type: cc.Prefab
         },
+        powerUpEnlargePrefab: {
+            default: null,
+            type: cc.Prefab
+        },
+        powerUpBoom: {
+            default: null,
+            type: cc.Prefab
+        },
         maxBalls: 1,
         colors: {
             default: [],
@@ -67,7 +75,10 @@ cc.Class({
         scoreValue: 0,
         gameRunning: false,
         memScore: 0,
-        currentLevel: 0
+        currentLevel: 0,
+        frameCounter: 0,
+        fixedFPS: 30,
+        frameCap: 0
     },
 
     onLoad() {
@@ -95,6 +106,7 @@ cc.Class({
             isContexed: false,
             scores: []
         };
+        this.frameCap = 1 / this.fixedFPS;
 
         this.node.on(cc.Node.EventType.TOUCH_START, this.onDragged.bind(this));
         this.node.on(cc.Node.EventType.TOUCH_MOVE, this.onDragged.bind(this));
@@ -114,7 +126,7 @@ cc.Class({
         this.bullets.push(newBullet);
         this.canvas.addChild(newBullet);
         newBullet.x = this.player.x;
-        newBullet.y = this.player.y + 30;
+        newBullet.y = this.player.y + 32;
     },
 
     loadLeaderboardScores() {
@@ -183,6 +195,8 @@ cc.Class({
 
     restart() {
         console.log("restart game");
+        this.currentLevel = 0;
+        this.player.getComponent("player").setLengthz(210);
         this.loadBestScore();
         this.guide.getComponent("guideBehaviour").phase(1);
         this.gameRunning = true;
@@ -214,6 +228,7 @@ cc.Class({
         this.updateAllStickState();
         this.setScore(0);
         this.loadLeaderboardScores();
+        this.frameCounter = 0;
     },
 
     setScore(val) {
@@ -308,8 +323,30 @@ cc.Class({
         }
     },
 
+    deleteOneRow() {
+        let lowest = 1000;
+        for (let i = 0; i < this.bricks.length; i++) {
+            const element = this.bricks[i];
+            if (element.y < lowest) {
+                lowest = element.y
+            }
+        }
+        let i = this.bricks.length;
+        while (i --) {
+            const element = this.bricks[i];
+            if (Math.abs(element.y - lowest) < 10) {
+                element.getComponent("brick").kaboom();
+            }
+        }
+    },
+
     addOneLevel() {
         // move downward
+        this.currentLevel += 1;
+        let enlarge = false;
+        if (this.currentLevel % 10 === 0) {
+            enlarge = true;
+        }
         let lowest = 1000;
         for (let i = 0; i < this.bricks.length; i++) {
             const element = this.bricks[i];
@@ -329,11 +366,24 @@ cc.Class({
         for (let i = 0; i < n; i++) {
             pool.push(1);
         }
+        let alreadyPutBoom = false;
         for (let i = 0; i < powerUp; i++) {
-            pool.push(2);
+            if (this.currentLevel > 15 && alreadyPutBoom === false) {
+                if (Math.random() < 0.5) {
+                    pool.push(4);
+                } else {
+                    pool.push(2);
+                }
+                alreadyPutBoom = true;
+            } else {
+                pool.push(2);
+            }
         }
         for (let i = n + powerUp; i < 8; i++) {
             pool.push(0);
+        }
+        if (enlarge === true) {
+            pool[Math.floor(Math.random() * pool.length)] = 3;
         }
         let doubled = false;
         for (let i = 0; i < 8; i++) {
@@ -361,6 +411,12 @@ cc.Class({
                 case 2:
                     brick = cc.instantiate(this.powerUpBallsPrefab);
                     break;
+                case 3:
+                    brick = cc.instantiate(this.powerUpEnlargePrefab);
+                    break;
+                case 4:
+                    brick = cc.instantiate(this.powerUpBoom);
+                    break;
                 default:
                     break;
             }
@@ -385,6 +441,14 @@ cc.Class({
             }
             this.score.node.scaleX = this.scoreBuldge + 1;
             this.score.node.scaleY = this.scoreBuldge + 1;
+        }
+        // fixed manual frame
+        this.frameCounter += dt;
+        if (this.frameCounter >= this.frameCap) {
+            this.frameCounter %= this.frameCap;
+            for (const elem of this.bullets) {
+                elem.getComponent("bullet").updateManually(this.frameCap);
+            }
         }
     },
 
@@ -415,7 +479,7 @@ cc.Class({
     touchRelease(e) {
         if (this.allSticked === true && this.state == "ready") {
             const rad = (90 - this.arrow.rotation) / 180.0 * Math.PI;
-            const dir = new cc.Vec2(Math.cos(rad) * 800, Math.sin(rad) * 800);
+            const dir = new cc.Vec2(Math.cos(rad) * 750, Math.sin(rad) * 750);
             for (let i = 0; i < this.bullets.length; i++) {
                 this.bullets[i].getComponent("bullet").launchIn(dir.x, dir.y, (i + 1) * 0.1);
             }

@@ -1,6 +1,8 @@
 cc.Class({
     extends: cc.Component,
 
+    
+
     properties: {
         sound: {
             type: cc.AudioClip,
@@ -19,27 +21,11 @@ cc.Class({
         manager.enabled = true;
     },
 
-    update(dt) {
+    updateManually(dt) {
         if (this.sticked === true) {
             this.node.x = window.controller.player.x;
             this.node.y = window.controller.player.y + 32;
         } else {
-            const velo = this.velocity.clone();
-            velo.mulSelf(dt);
-            // inside test
-            const next = new cc.Vec2(this.node.x + velo.x, this.node.y + velo.y);
-            for (const brick of window.controller.bricks) {
-                if (next.x >= brick.x - brick.width / 2 && next.x <= brick.x + brick.width / 2 && next.y >= brick.y - brick.height / 2 && next.y <= brick.y + brick.height / 2) {
-                    const xDiff = Math.abs(next.x - brick.x);
-                    const yDiff = Math.abs(next.y - brick.y);
-                    const boxes = [];
-                    boxes.push(new cc.Vec2(brick.x - xDiff, brick.y + yDiff));
-                    boxes.push(new cc.Vec2(brick.x - xDiff, brick.y - yDiff));
-                    boxes.push(new cc.Vec2(brick.x + xDiff, brick.y - yDiff));
-                    boxes.push(new cc.Vec2(brick.x + xDiff, brick.y + yDiff));
-                    this.reflect(new cc.Vec2(this.node.x, this.node.y), boxes);
-                }
-            }
             this.node.x += this.velocity.x * dt;
             this.node.y += this.velocity.y * dt;
             if (this.node.y < -660 || this.node.y > 660 || this.node.x < -380 || this.node.x > 380) {
@@ -77,62 +63,65 @@ cc.Class({
 
     reflect(p, box) {
         let normal = new cc.Vec2(0, 1);
-        if (p.x < box[0].x) {
-            if (p.y < box[1].y) {
-                // bottom left
-                normal = new cc.Vec2(p.x - box[1].x, p.y - box[1].y);
-            } else if (p.y <= box[0].y) {
-                // left
+        if (p.x > box[0].x && p.x < box[2].x && p.y > box[2].y && p.y < box[0].y) {
+            const ldis = p.x - box[0].x;
+            const rdis = box[2].x - p.x;
+            const udis = box[0].y - p.y;
+            const ddis = p.y - box[2].y;
+            if (ldis < rdis && ldis < udis && ldis < ddis) {
                 normal = new cc.Vec2(-1, 0);
-            } else {
-                // top left
-                normal = new cc.Vec2(p.x - box[0].x, p.y - box[0].y);
-            }
-        } else if (p.x <= box[3].x) {
-            if (p.y <= box[1].y) {
-                // down
-                normal = new cc.Vec2(0, -1);
-            } else if (p.y >= box[1].y) {
-                // up
+            } else if (rdis < ldis && rdis < udis && rdis < ddis) {
+                normal = new cc.Vec2(1, 0);
+            } else if (udis < ldis && udis < rdis && udis < ddis) {
                 normal = new cc.Vec2(0, 1);
+            } else {
+                normal = new cc.Vec2(0, -1);
             }
         } else {
-            if (p.y < box[1].y) {
-                // bottom right
-                normal = new cc.Vec2(p.x - box[2].x, p.y - box[2].y);
-            } else if (p.y <= box[0].y) {
-                // right
-                normal = new cc.Vec2(1, 0);
+            if (p.x < box[0].x) {
+                if (p.y < box[1].y) {
+                    // bottom left
+                    normal = new cc.Vec2(p.x - box[1].x, p.y - box[1].y);
+                } else if (p.y <= box[0].y) {
+                    // left
+                    normal = new cc.Vec2(-1, 0);
+                } else {
+                    // top left
+                    normal = new cc.Vec2(p.x - box[0].x, p.y - box[0].y);
+                }
+            } else if (p.x <= box[3].x) {
+                if (p.y <= box[1].y) {
+                    // down
+                    normal = new cc.Vec2(0, -1);
+                } else if (p.y >= box[0].y) {
+                    // up
+                    normal = new cc.Vec2(0, 1);
+                }
             } else {
-                // top right
-                normal = new cc.Vec2(p.x - box[3].x, p.y - box[3].y);
+                if (p.y < box[1].y) {
+                    // bottom right
+                    normal = new cc.Vec2(p.x - box[2].x, p.y - box[2].y);
+                } else if (p.y <= box[0].y) {
+                    // right
+                    normal = new cc.Vec2(1, 0);
+                } else {
+                    // top right
+                    normal = new cc.Vec2(p.x - box[3].x, p.y - box[3].y);
+                }
             }
         }
         normal.normalizeSelf();
-        const reflection = this.velocity.sub(normal.mulSelf(2 * normal.dot(this.velocity)));
+        let reflection = this.velocity.sub(normal.mulSelf(2 * normal.dot(this.velocity)));
+        if (Math.abs(reflection.y) / Math.abs(reflection.x) < 0.26794919243112270647255365849413) {
+            const xSign = reflection.x < 0 ? -1 : 1;
+            const ySign = reflection.y < 0 ? -1 : 1;
+            reflection = new cc.Vec2(724.44436971680121506230739979667 * xSign, 194.11428382689057176167412821804 * ySign);
+        }
         this.velocity = reflection;
-
     },
 
     onCollisionEnter(other, self) {
         cc.audioEngine.play(this.sound, false, 1);
-        if (other.tag == 0) {
-            this.uselessCollide = 0;
-        } else if (other.tag == 1) {
-            this.uselessCollide += 1;
-            if (this.uselessCollide > 7) {
-                this.velocity.y += 300;
-            }
-        }
-        this.reflect(self.world.position, other.world.points);
     },
-
-    onCollisionStay(other, self) {
-        const sp = self.world.position;
-        const ops = other.world.points;
-        if (sp.x > ops[0].x && sp.x < ops[2].x && sp.y > ops[2].y && sp.y < ops[0].y) {
-            this.reflect(self.world.position, other.world.points);
-        }
-    }
 
 });
