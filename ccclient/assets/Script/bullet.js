@@ -1,7 +1,7 @@
+const cfg = require("./Constants");
+
 cc.Class({
     extends: cc.Component,
-
-    
 
     properties: {
         sound: {
@@ -24,7 +24,7 @@ cc.Class({
     updateManually(dt) {
         if (this.sticked === true) {
             this.node.x = window.controller.player.x;
-            this.node.y = window.controller.player.y + 32;
+            this.node.y = window.controller.player.y + cfg.BULLET_PLAYER_OFFSET;
         } else {
             this.node.x += this.velocity.x * dt;
             this.node.y += this.velocity.y * dt;
@@ -35,7 +35,7 @@ cc.Class({
                 } else {
                     console.warn("bullets not in controller");
                 }
-                this.node.destroy();
+                window.controller.recyclePrefab(cfg.KEY.BULLET, this.node);
                 window.controller.updateAllStickState();
             }
         }
@@ -122,6 +122,16 @@ cc.Class({
 
     onCollisionEnter(other, self) {
         cc.audioEngine.play(this.sound, false, 1);
+        const p = cc.v2(self.node.x, self.node.y);
+        const ox = other.node.x;
+        const oy = other.node.y;
+        const ow = other.node.width;
+        const oh = other.node.height;
+        const box0 = cc.v2(ox - ow, oy + oh);
+        const box1 = cc.v2(ox - ow, oy - oh);
+        const box2 = cc.v2(ox + ow, oy - oh);
+        const box3 = cc.v2(ox + ow, oy + oh);
+        this.reflect(p, [box0, box1, box2, box3]);
     },
 
 });

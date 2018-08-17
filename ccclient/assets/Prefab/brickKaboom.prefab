@@ -67,7 +67,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 248,
+    "_localZOrder": 207,
     "groupIndex": 0,
     "_id": ""
   },
@@ -89,8 +89,8 @@
       "__uuid__": "410fb916-8721-4663-bab8-34397391ace7"
     },
     "_stopped": true,
-    "playOnLoad": true,
-    "autoRemoveOnFinish": true,
+    "playOnLoad": false,
+    "autoRemoveOnFinish": false,
     "totalParticles": 40,
     "duration": 0.15,
     "emissionRate": 150,
@@ -165,7 +165,7 @@
     "rotatePerS": 0,
     "rotatePerSVar": 0,
     "_N$preview": true,
-    "_id": "70RE6lycJNjZVfyuRC1byz"
+    "_id": "8ejuQwhmNEbIiwXStZAdA7"
   },
   {
     "__type__": "cc.PrefabInfo",

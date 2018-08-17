@@ -21,7 +21,7 @@ cc.Class({
         rhythm: 0.7,
         rotationBeats: 8,
         flipSizeBeats: 4,
-        bulgeOnceBeats: 1
+        bulgeOnceBeats: 1,
     },
 
     onLoad () {
@@ -43,10 +43,6 @@ cc.Class({
                 i += 1;
             }
         }
-    },
-
-    start () {
-        
     },
 
     update (dt) {

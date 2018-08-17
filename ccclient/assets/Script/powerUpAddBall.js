@@ -1,23 +1,16 @@
+const cfg = require("./Constants");
+
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        bullet: {
-            default: null,
-            type: cc.Prefab
-        },
-        plusOne: {
-            default: null,
-            type: cc.Prefab
-        }
     },
 
     takeHit(ball) {
         this.node.getComponent("brick").kaboom();
         window.controller.addScore(2);
         
-        const newBullet = cc.instantiate(this.bullet);
-        window.controller.canvas.addChild(newBullet);
+        const newBullet = window.controller.instantiatePrefab(cfg.KEY.BULLET, window.controller.canvas);
         newBullet.x = this.node.x;
         newBullet.y = this.node.y;
         const bulletBehaviour = newBullet.getComponent("bullet");
@@ -26,8 +19,7 @@ cc.Class({
         window.controller.bullets.push(newBullet);
 
         // visual effect + 1
-        const visualPlus1 = cc.instantiate(this.plusOne);
-        window.controller.canvas.addChild(visualPlus1);
+        const visualPlus1 = window.controller.instantiatePrefab(cfg.KEY.PLUS_ONE, window.controller.canvas);
         visualPlus1.x = this.node.x;
         visualPlus1.y = this.node.y + 40;
     }

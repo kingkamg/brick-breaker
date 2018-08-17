@@ -1,88 +1,45 @@
+const cfg = require("./Constants");
+
+let brickId = 1;
+
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        player: {
-            default: null,
-            type: cc.Node
-        },
-        canvas: {
-            default: null,
-            type: cc.Node
-        },
-        arrow: {
-            default: null,
-            type: cc.Node
-        },
-        bullets: {
-            default: [],
-            type: [cc.Node]
-        },
-        bricks: {
-            default: [],
-            type: [cc.Node]
-        },
-        levelContainer: {
-            default: null,
-            type: cc.Node
-        },
-        score: {
-            default: null,
-            type: cc.Label
-        },
-        scoreBuldge: 0,
-        bestScore: {
-            default: null,
-            type: cc.Label
-        },
-        gameOver: {
-            default: null,
-            type: cc.Node
-        },
-        guide: {
-            default: null,
-            type: cc.Node
-        },
-        state: "ready", // ready, moving
-        allSticked: true,
-        touchPressed: false,
-        touchLoc: null,
-        bulletPrefab: {
-            default: null,
-            type: cc.Prefab
-        },
-        brickPrefab: {
-            default: null,
-            type: cc.Prefab
-        },
-        powerUpBallsPrefab: {
-            default: null,
-            type: cc.Prefab
-        },
-        powerUpEnlargePrefab: {
-            default: null,
-            type: cc.Prefab
-        },
-        powerUpBoom: {
-            default: null,
-            type: cc.Prefab
-        },
-        maxBalls: 1,
-        colors: {
-            default: [],
-            type: [cc.color]
-        },
-        scoreValue: 0,
-        gameRunning: false,
-        memScore: 0,
-        currentLevel: 0,
-        frameCounter: 0,
-        fixedFPS: 30,
-        frameCap: 0
+        player:               {type: cc.Node,    default: null},
+        canvas:               {type: cc.Node,    default: null},
+        arrow:                {type: cc.Node,    default: null},
+        bullets:              {type: [cc.Node],  default: []},
+        bricks:               {type: [cc.Node],  default: []},
+        levelContainer:       {type: cc.Node,    default: null},
+        score:                {type: cc.Label,   default: null},
+        scoreBuldge:          0,
+        bestScore:            {type: cc.Label,   default: null},
+        gameOver:             {type: cc.Node,    default: null},
+        guide:                {type: cc.Node,    default: null},
+        state:                "ready", // ready, moving
+        allSticked:           true,
+        touchPressed:         false,
+        touchLoc:             null,
+        bulletPrefab:         {type: cc.Prefab,  default: null},
+        sfxKaboomPrefab:      {type: cc.Prefab,  default: null},
+        brickPrefab:          {type: cc.Prefab,  default: null},
+        powerUpBallsPrefab:   {type: cc.Prefab,  default: null},
+        powerUpEnlargePrefab: {type: cc.Prefab,  default: null},
+        powerUpBoom:          {type: cc.Prefab,  default: null},
+        plusOnePrefab:        {type: cc.Prefab,  default: null},
+        maxBalls:             1,
+        colors:               {type: [cc.color], default: []},
+        scoreValue:           0,
+        gameRunning:          false,
+        memScore:             0,
+        currentLevel:         0,
+        frameCounter:         0,
+        fixedFPS:             30,
+        frameCap:             0,
     },
 
     onLoad() {
-        cc.debug.setDisplayStats(false);
         this.bricksPool = [
             3, 3, 3, 3, 3,
             4, 4, 4, 4, 4, 4, 4, 4,
@@ -113,6 +70,73 @@ cc.Class({
         this.node.on(cc.Node.EventType.TOUCH_CANCEL, this.touchRelease.bind(this));
         this.node.on(cc.Node.EventType.TOUCH_END, this.touchRelease.bind(this));
         window.controller = this;
+        // 对象池
+        this.nodePools = {};
+        for (const key of Object.keys(cfg.POOL_SIZES)) {
+            this.nodePools[key] = new cc.NodePool();
+            const whichPrefab = this.findPrefabByName(key);
+            for (let i = 0; i < cfg.POOL_SIZES[key]; i++) {
+                this.nodePools[key].put(cc.instantiate(whichPrefab));
+            }
+        }
+    },
+
+    findPrefabByName(key) {
+        let whichPrefab = null;
+        switch (key) {
+            case cfg.KEY.BULLET: {
+                whichPrefab = this.bulletPrefab;
+                break;
+            }
+            case cfg.KEY.SFX_KABOOM: {
+                whichPrefab = this.sfxKaboomPrefab;
+                break;
+            }
+            case cfg.KEY.PLUS_ONE: {
+                whichPrefab = this.plusOnePrefab;
+                break;
+            }
+            case cfg.KEY.BRICK: {
+                whichPrefab = this.brickPrefab;
+                break;
+            }
+            case cfg.KEY.PU_BALL: {
+                whichPrefab = this.powerUpBallsPrefab;
+                break;
+            }
+            case cfg.KEY.PU_ENLARGE: {
+                whichPrefab = this.powerUpEnlargePrefab;
+                break;
+            }
+            case cfg.KEY.PU_BOOM: {
+                whichPrefab = this.powerUpBoom;
+                break;
+            }
+        }
+        if (whichPrefab === null) {
+            throw new Error("Corrupted Constant.js " + key);
+        }
+        return whichPrefab;
+    },
+
+    instantiatePrefab(prefabName, parentNode) {
+        if (this.nodePools.hasOwnProperty(prefabName) === false) {
+            throw new Error("creating prefab does not exist in pool " + prefabName);
+        }
+        if (this.nodePools[prefabName].size() <= 0) {
+            const whichPrefab = this.findPrefabByName(prefabName);
+            this.nodePools[prefabName].put(cc.instantiate(whichPrefab));
+        }
+        const obj = this.nodePools[prefabName].get();
+        obj.parent = parentNode;
+        return obj;
+    },
+
+    recyclePrefab(prefabName, obj) {
+        if (this.nodePools.hasOwnProperty(prefabName) === false) {
+            throw new Error("Recycling prefab does not exist in pool " + prefabName);
+        }
+        this.nodePools[prefabName].put(obj);
     },
 
     startGame() {
@@ -122,11 +146,10 @@ cc.Class({
         this.loadLeaderboardScores();
         this.addOneLevel();
         this.gameRunning = true;
-        const newBullet = cc.instantiate(this.bulletPrefab);
+        const newBullet = this.instantiatePrefab(cfg.KEY.BULLET, this.canvas);
         this.bullets.push(newBullet);
-        this.canvas.addChild(newBullet);
         newBullet.x = this.player.x;
-        newBullet.y = this.player.y + 32;
+        newBullet.y = this.player.y + cfg.BULLET_PLAYER_OFFSET;
     },
 
     loadLeaderboardScores() {
@@ -201,23 +224,18 @@ cc.Class({
         this.guide.getComponent("guideBehaviour").phase(1);
         this.gameRunning = true;
         this.gameOver.active = false;
-        let brick = this.bricks.pop();
-        while (brick != undefined) {
-            brick.destroy();
-            brick = this.bricks.pop();
-        }
-        brick = this.bullets.pop();
-        while (brick != undefined) {
-            brick.destroy();
-            brick = this.bullets.pop();
+        this.destroyAllLevels();
+        let bullet = this.bullets.pop();
+        while (bullet !== undefined) {
+            this.recyclePrefab(cfg.KEY.BULLET, bullet);
+            bullet = this.bullets.pop();
         }
         this.player.x = 0;
         this.player.y = -400;
 
-        const newBullet = cc.instantiate(this.bulletPrefab);
-        this.canvas.addChild(newBullet);
-        newBullet.x = 0;
-        newBullet.y = -367;
+        const newBullet = this.instantiatePrefab(cfg.KEY.BULLET, this.canvas);
+        newBullet.x = this.player.x;
+        newBullet.y = this.player.y + cfg.BULLET_PLAYER_OFFSET;
         const bulletBehaviour = newBullet.getComponent("bullet");
         bulletBehaviour.sticked = true;
         this.bullets.push(newBullet);
@@ -317,9 +335,7 @@ cc.Class({
     destroyAllLevels() {
         let i = this.bricks.length;
         while (i --) {
-            const elem = this.bricks[i];
-            this.bricks.splice(i, 1)
-            elem.destroy();
+            this.bricks[i].getComponent("brick").kaboom();
         }
     },
 
@@ -390,8 +406,8 @@ cc.Class({
             const index = Math.floor(Math.random() * pool.length);
             let brick = null;
             switch (pool[index]) {
-                case 1:
-                    brick = cc.instantiate(this.brickPrefab);
+                case 1: {
+                    brick = this.instantiatePrefab(cfg.KEY.BRICK, this.levelContainer);
                     let hp = this.maxBalls;
                     if (hp > this.bullets.length) {
                         hp = hp * 0.8;
@@ -406,23 +422,26 @@ cc.Class({
                     if (hp < 1) {
                         hp = 1;
                     }
-                    brick.getComponent("brickNormal").hp = hp;
+                    const brickBehaviour = brick.getComponent("brickNormal");
+                    brickBehaviour.hp = hp;
+                    brickBehaviour.updateHP();
                     break;
-                case 2:
-                    brick = cc.instantiate(this.powerUpBallsPrefab);
+                }
+                case 2: {
+                    brick = this.instantiatePrefab(cfg.KEY.PU_BALL, this.levelContainer);
                     break;
-                case 3:
-                    brick = cc.instantiate(this.powerUpEnlargePrefab);
+                }
+                case 3: {
+                    brick = this.instantiatePrefab(cfg.KEY.PU_ENLARGE, this.levelContainer);
                     break;
-                case 4:
-                    brick = cc.instantiate(this.powerUpBoom);
+                }
+                case 4: {
+                    brick = this.instantiatePrefab(cfg.KEY.PU_BOOM, this.levelContainer);
                     break;
-                default:
-                    break;
+                }
             }
             if (brick != null) {
                 this.bricks.push(brick);
-                this.levelContainer.addChild(brick);
                 brick.x = -314 + i * 90;
                 brick.y = 430;
             }

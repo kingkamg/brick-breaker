@@ -1,0 +1,3 @@
+[submodule "ccclient/build-templates"]
+	path = ccclient/build-templates
+	url = http://mjwork.elifegames.com/gitlab/share/build-templates.git

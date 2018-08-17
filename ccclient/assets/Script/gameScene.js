@@ -3,7 +3,7 @@ cc.Class({
 
     properties: {
         loginUINode: {type: cc.Node, default: null},
-        gameUINode: {type: cc.Node, default: null},
+        gameUINode:  {type: cc.Node, default: null},
     },
 
     onRestartClicked() {

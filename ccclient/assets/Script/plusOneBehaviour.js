@@ -1,3 +1,5 @@
+const cfg = require("./Constants");
+
 cc.Class({
     extends: cc.Component,
 
@@ -15,7 +17,7 @@ cc.Class({
         this.life -= dt;
         this.node.opacity = 255 * this.life / this.originalLife;
         if (this.life <= 0) {
-            this.node.destroy();
+            window.controller.recyclePrefab(cfg.KEY.PLUS_ONE, this.node);
         }
     },
 });
