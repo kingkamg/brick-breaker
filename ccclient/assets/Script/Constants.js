@@ -1,6 +1,6 @@
 module.exports = {
-    TEST: true,
-    SPLASH_TIME: 0,
+    TEST: false,
+    SPLASH_TIME: 2,
     BULLET_PLAYER_OFFSET: 31,
     KEY: {
         BRICK: "BRICK",

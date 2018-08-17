@@ -1,3 +1,4 @@
+import sdk from "./sdk/sdk";
 const cfg = require("./Constants");
 
 let brickId = 1;
@@ -79,6 +80,17 @@ cc.Class({
                 this.nodePools[key].put(cc.instantiate(whichPrefab));
             }
         }
+        // sdk
+        sdk.init();
+        sdk.onUserNoLogin();
+        // wechat share
+        sdk.setShareInfoCallback(() => {
+            return {
+                imageUrl: "sdkAssets/longzhu.png",
+                query: "",
+                title: "好气，差一点就集齐了，帮帮我！",
+            };
+        });
     },
 
     findPrefabByName(key) {
