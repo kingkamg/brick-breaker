@@ -3929,15 +3929,18 @@
         "__id__": 93
       },
       {
-        "__id__": 98
+        "__id__": 97
       },
       {
-        "__id__": 106
+        "__id__": 105
       }
     ],
     "_active": true,
     "_level": 1,
     "_components": [
+      {
+        "__id__": 108
+      },
       {
         "__id__": 109
       }
@@ -4005,9 +4008,6 @@
     "_components": [
       {
         "__id__": 96
-      },
-      {
-        "__id__": 97
       }
     ],
     "_prefab": null,
@@ -4168,27 +4168,6 @@
     "_id": "a5hR3nM2ZK8reZUrMGyLRA"
   },
   {
-    "__type__": "447c9WQL9RNGoNIoUCRbfoS",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 93
-    },
-    "_enabled": true,
-    "alignTopWider": 0,
-    "alignTopNarrower": 0,
-    "alignBottomWider": 0,
-    "alignBottomNarrower": 0,
-    "alignLeftWider": 0,
-    "alignLeftNarrower": 0,
-    "alignRightWider": 0,
-    "alignRightNarrower": 0,
-    "enableScaleAdapter": true,
-    "scaleWider": 1,
-    "scaleNarrower": 0.8,
-    "_id": "73FZh5oSVORZdfph9C9Ddf"
-  },
-  {
     "__type__": "cc.Node",
     "_name": "start",
     "_objFlags": 0,
@@ -4197,20 +4176,20 @@
     },
     "_children": [
       {
-        "__id__": 99
+        "__id__": 98
       }
     ],
     "_active": true,
     "_level": 2,
     "_components": [
       {
+        "__id__": 100
+      },
+      {
         "__id__": 101
       },
       {
-        "__id__": 102
-      },
-      {
-        "__id__": 105
+        "__id__": 104
       }
     ],
     "_prefab": null,
@@ -4264,14 +4243,14 @@
     "_name": "New Sprite",
     "_objFlags": 0,
     "_parent": {
-      "__id__": 98
+      "__id__": 97
     },
     "_children": [],
     "_active": true,
     "_level": 0,
     "_components": [
       {
-        "__id__": 100
+        "__id__": 99
       }
     ],
     "_prefab": null,
@@ -4325,7 +4304,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 99
+      "__id__": 98
     },
     "_enabled": true,
     "_srcBlendFactor": 770,
@@ -4353,7 +4332,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 98
+      "__id__": 97
     },
     "_enabled": true,
     "_srcBlendFactor": 770,
@@ -4381,7 +4360,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 98
+      "__id__": 97
     },
     "_enabled": true,
     "transition": 0,
@@ -4403,10 +4382,10 @@
     "zoomScale": 1.2,
     "clickEvents": [
       {
-        "__id__": 103
+        "__id__": 102
       },
       {
-        "__id__": 104
+        "__id__": 103
       }
     ],
     "_N$interactable": true,
@@ -4432,7 +4411,7 @@
     "hoverSprite": null,
     "_N$disabledSprite": null,
     "_N$target": {
-      "__id__": 98
+      "__id__": 97
     },
     "_id": "8cWfoaIZdLG6/h16Ue83Q6"
   },
@@ -4448,7 +4427,7 @@
   {
     "__type__": "cc.ClickEvent",
     "target": {
-      "__id__": 98
+      "__id__": 97
     },
     "component": "buttonExtras",
     "handler": "pressed",
@@ -4459,7 +4438,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 98
+      "__id__": 97
     },
     "_enabled": true,
     "sound": {
@@ -4479,10 +4458,10 @@
     "_level": 2,
     "_components": [
       {
-        "__id__": 107
+        "__id__": 106
       },
       {
-        "__id__": 108
+        "__id__": 107
       }
     ],
     "_prefab": null,
@@ -4536,14 +4515,14 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 106
+      "__id__": 105
     },
     "_enabled": true,
     "_srcBlendFactor": 1,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "v1.0.0-R6",
-    "_N$string": "v1.0.0-R6",
+    "_string": "v1.0.0-R7",
+    "_N$string": "v1.0.0-R7",
     "_fontSize": 20,
     "_lineHeight": 20,
     "_enableWrapText": true,
@@ -4561,7 +4540,7 @@
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 106
+      "__id__": 105
     },
     "_enabled": true,
     "alignMode": 1,
@@ -4635,6 +4614,16 @@
       "__id__": 92
     },
     "_id": "eccKUu4iJOTZFNf8aOlZ6C"
+  },
+  {
+    "__type__": "6ee50aHMI1PKKPSzls4iq5E",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 92
+    },
+    "_enabled": true,
+    "_id": "98liWBmdlHhrundpyIYP+i"
   },
   {
     "__type__": "cc.Node",

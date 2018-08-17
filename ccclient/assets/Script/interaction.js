@@ -84,13 +84,15 @@ cc.Class({
         sdk.init();
         sdk.onUserNoLogin();
         // wechat share
-        sdk.setShareInfoCallback(() => {
-            return {
-                imageUrl: "sdkAssets/longzhu.png",
-                query: "",
-                title: "好气，差一点就集齐了，帮帮我！",
-            };
-        });
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            sdk.setShareInfoCallback(() => {
+                return {
+                    imageUrl: "sdkAssets/longzhu.png",
+                    query: "",
+                    title: "好气，差一点就集齐了，帮帮我！",
+                };
+            });
+        }
     },
 
     findPrefabByName(key) {
