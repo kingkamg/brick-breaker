@@ -1,4 +1,4 @@
-const cfg = require("./Constants");
+import cfg from "./Constants";
 
 cc.Class({
     extends: cc.Component,

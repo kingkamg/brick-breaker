@@ -21,10 +21,6 @@ cc.Class({
         },
     },
 
-    start() {
-
-    },
-
     enlarge() {
         this.setLengthz(this.lengthz + 30);
     },

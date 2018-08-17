@@ -1,0 +1,25 @@
+export default {
+    BULLET_MIN_ANGLE: 0.261799,
+    BULLET_PLAYER_OFFSET: 31,
+    BULLET_SPEED: 750,
+    KEY: {
+        BRICK: "BRICK",
+        BULLET: "BULLET",
+        PLUS_ONE: "PLUS_ONE",
+        PU_BALL: "PU_BALL",
+        PU_BOOM: "PU_BOOM",
+        PU_ENLARGE: "PU_ENLARGE",
+        SFX_KABOOM: "SFX_KABOOM",
+    },
+    POOL_SIZES: {
+        BRICK: 32,
+        BULLET: 20,
+        PLUS_ONE: 4,
+        PU_BALL: 24,
+        PU_BOOM: 1,
+        PU_ENLARGE: 8,
+        SFX_KABOOM: 6,
+    },
+    SPLASH_TIME: 2,
+    TEST: false,
+};

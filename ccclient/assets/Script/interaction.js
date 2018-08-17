@@ -1,5 +1,6 @@
 import sdk from "./sdk/sdk";
-const cfg = require("./Constants");
+import Arrow from "./Arrow";
+import cfg from "./Constants";
 
 let brickId = 1;
 
@@ -9,7 +10,7 @@ cc.Class({
     properties: {
         player:               {type: cc.Node,    default: null},
         canvas:               {type: cc.Node,    default: null},
-        arrow:                {type: cc.Node,    default: null},
+        arrow:                {type: Arrow,      default: null},
         bullets:              {type: [cc.Node],  default: []},
         bricks:               {type: [cc.Node],  default: []},
         levelContainer:       {type: cc.Node,    default: null},
@@ -80,6 +81,8 @@ cc.Class({
                 this.nodePools[key].put(cc.instantiate(whichPrefab));
             }
         }
+        // Arrow
+        this.arrow.init();
         // sdk
         sdk.init();
         sdk.onUserNoLogin();
@@ -219,7 +222,6 @@ cc.Class({
                 console.log(rejected);
             });
         } else {
-            console.log("read from localstorage")
             let score = cc.sys.localStorage.getItem("score");
             if (score !== null && score !== "") {
                 this.bestScore.string = score;
@@ -231,7 +233,6 @@ cc.Class({
     },
 
     restart() {
-        console.log("restart game");
         this.currentLevel = 0;
         this.player.getComponent("player").setLengthz(210);
         this.loadBestScore();
@@ -303,13 +304,13 @@ cc.Class({
                 console.log(rejected);
             });
         } else {
-            console.log("write to localstorage")
             cc.sys.localStorage.setItem("score", this.memScore.toString());
         }
     },
 
     gameEnd() {
         if (this.gameRunning === false) return;
+        this.guide.active = false;
         let level = 1;
         if (typeof (FBInstant) != "undefined") {
             if (this.leaderboardScores.isContexed === false) {
@@ -465,7 +466,7 @@ cc.Class({
 
     update(dt) {
         if (this.touchPressed === true && this.allSticked === true && this.state == "ready") {
-            this.updateArrow();
+            this.arrow.updateArrow(cc.v2(this.player.x, this.player.y), cc.v2(this.touchLoc.x - 360, this.touchLoc.y - 640));
         }
         if (this.scoreBuldge > 0) {
             this.scoreBuldge -= dt * dt * 150;
@@ -485,22 +486,6 @@ cc.Class({
         }
     },
 
-    updateArrow() {
-        this.arrow.x = this.player.x;
-        this.arrow.active = true;
-
-        this.arrowRad = Math.atan2(this.touchLoc.y - 640 - this.arrow.y, this.touchLoc.x - 360 - this.arrow.x);
-        let deg = 90 - this.arrowRad / Math.PI * 180.0;
-        if ((deg >= -90 && deg < -75) || (deg <= 270 && deg > 255)) {
-            deg = -75;
-        } else if (deg > 75 && deg < 105) {
-            deg = 75
-        } else if (deg >= 105 && deg <= 255) {
-            deg -= 180;
-        }
-        this.arrow.rotation = deg;
-    },
-
     onDragged(e) {
         this.touchLoc = e.getLocation();
         if (this.state == "moving" && this.touchPressed == true) {
@@ -511,13 +496,13 @@ cc.Class({
 
     touchRelease(e) {
         if (this.allSticked === true && this.state == "ready") {
-            const rad = (90 - this.arrow.rotation) / 180.0 * Math.PI;
-            const dir = new cc.Vec2(Math.cos(rad) * 750, Math.sin(rad) * 750);
+            const dir = this.arrow.getDirection();
+            dir.normalizeSelf().mulSelf(cfg.BULLET_SPEED);
             for (let i = 0; i < this.bullets.length; i++) {
                 this.bullets[i].getComponent("bullet").launchIn(dir.x, dir.y, (i + 1) * 0.1);
             }
             this.allSticked = false;
-            this.arrow.active = false;
+            this.arrow.dismiss();
             this.state = "moving";
         } else if (this.state == "moving" && this.allSticked === true) {
             this.state = "ready";
