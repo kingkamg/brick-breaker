@@ -1,12 +1,13 @@
 import LoginUIAnime from "./LoginUIAnime";
+const leaderboardBehaviour = require("./leaderboard");
 
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        loginUI:    {type: LoginUIAnime, default: null},
-        gameUINode: {type: cc.Node, default: null},
-        display:    {type: cc.Sprite, default: null},
+        loginUI:     {type: LoginUIAnime, default: null},
+        gameUINode:  {type: cc.Node, default: null},
+        leaderboard: {type: leaderboardBehaviour, default: null},
     },
 
     onRestartClicked() {
@@ -19,26 +20,9 @@ cc.Class({
         window.controller.restart();
     },
 
-    start () {
-        this.tex = new cc.Texture2D();
-    },
-
-    // 刷新开放数据域的纹理
-    _updateSubDomainCanvas () {
-        if (!this.tex) {
-            return;
-        }
-        var openDataContext = wx.getOpenDataContext();
-        var sharedCanvas = openDataContext.canvas;
-        console.log(sharedCanvas);
-        this.tex.initWithElement(sharedCanvas);
-        this.tex.handleLoadedTexture();
-        this.display.spriteFrame = new cc.SpriteFrame(this.tex);
-    },
-
-    update () {
+    onClickedLeaderboard() {
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-            this._updateSubDomainCanvas();
+            this.leaderboard.show();
         }
     },
 

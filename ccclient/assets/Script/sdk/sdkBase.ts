@@ -183,4 +183,27 @@ export default class SDKBase {
   public setShareInfoCallback (callback:()=>{title,imageUrl,query}) {
 
   }
+
+  // 社交类
+
+  /**
+   * 获取排行榜数据
+   * @param {string} whichBoard 排行榜名称，KVData里面的Key
+   * @param {number} rankType 排行榜类型，0: 好友 1: 群组 2: 自己
+   * @returns Promise<any>
+   */
+  public fetchLeaderboardData(whichBoard: string, rankType: number): Promise<any> {
+    return null
+  }
+
+  /**
+   * 更新玩家在排行榜上的分数
+   * @param {string} whichBoard 排行榜名称，KVData里面的Key
+   * @param {number} score 玩家分数，注意，该方法不判断“低分不能覆盖高分”的逻辑
+   * @returns Promise<any>
+   */
+  public updateLeaderboardScore(whichBoard: string, score: number): Promise<void> {
+    return null
+  }
+
 }

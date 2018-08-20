@@ -30,7 +30,18 @@
   ],
   "design-resolution-height": 1280,
   "design-resolution-width": 720,
-  "excluded-modules": [],
+  "excluded-modules": [
+    "TiledMap",
+    "Spine Skeleton",
+    "DragonBones",
+    "RichText",
+    "MotionStreak",
+    "ProgressBar",
+    "PageView",
+    "PageViewIndicator",
+    "Slider",
+    "Physics"
+  ],
   "fit-height": true,
   "fit-width": false,
   "group-list": [

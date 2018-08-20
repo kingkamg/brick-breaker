@@ -55,7 +55,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 480,
+      "width": 500,
       "height": 108
     },
     "_anchorPoint": {
@@ -86,7 +86,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 197,
+    "_localZOrder": 82,
     "groupIndex": 0,
     "_id": ""
   },
@@ -246,7 +246,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "5a4Upu6thD/rLk+vdV1w6k"
+    "_id": "30MuZzzpVK25CBy6mggM0x"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -274,7 +274,7 @@
     "_segments": 64,
     "_N$alphaThreshold": 0,
     "_N$inverted": false,
-    "_id": "5aeiv2DLxHnILUuy0+W2TS"
+    "_id": "03E2DN3qhL6amXC+lnxtMz"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -370,10 +370,10 @@
     "_isSystemFontUsed": true,
     "_spacingX": 0,
     "_N$horizontalAlign": 0,
-    "_N$verticalAlign": 0,
+    "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
-    "_id": "f9H0+nWvxI2qQdd6MJtITj"
+    "_id": "1bYsAlaORC8KAdxzRj2Zuh"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -469,10 +469,10 @@
     "_isSystemFontUsed": true,
     "_spacingX": 0,
     "_N$horizontalAlign": 0,
-    "_N$verticalAlign": 0,
+    "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
-    "_id": "9cS2RVbeJL7JQCXbox+Ojm"
+    "_id": "b18LpwCm1CHIXgJmzLTmIe"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -638,7 +638,7 @@
     "_N$verticalAlign": 0,
     "_N$fontFamily": "Arial",
     "_N$overflow": 0,
-    "_id": "e03WU6S1dD/piN0OsbUZkM"
+    "_id": "65Umn/oJ5LWbmLS6X5en66"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -677,7 +677,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "c0u/M6U1hD9IctaDQgWlJx"
+    "_id": "80gZyDF2RGf6Y7M8+6zON5"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -779,7 +779,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "1eg1sww25D7LvdeGrQxxqy"
+    "_id": "b8aR/cOb1MrpqYtiuHaesH"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -818,7 +818,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "f6+ACysfpHXbSaywxv0K4z"
+    "_id": "9dzU9f7KZAe5cgandC0K45"
   },
   {
     "__type__": "2be83ovY/9F2o2O549vjlnO",
@@ -843,7 +843,7 @@
     "rankBack": {
       "__id__": 14
     },
-    "_id": "30bIGjXlBPVJLR7F2hth+B"
+    "_id": "daHx/2nxVN96V8wUqjn2Fp"
   },
   {
     "__type__": "cc.PrefabInfo",

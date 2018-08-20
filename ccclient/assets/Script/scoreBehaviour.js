@@ -38,7 +38,7 @@ cc.Class({
             this.rankBack.color = new cc.color(44, 62, 80);
         }
 
-        cc.loader.load(avatar, (err, tex) => {
+        cc.loader.load({url: avatar, type: "png"}, (err, tex) => {
             if (err) {
                 console.log("load avatar failed", err);
             } else {

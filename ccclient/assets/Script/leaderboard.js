@@ -1,19 +1,10 @@
-cc.Class({
+module.exports = cc.Class({
     extends: cc.Component,
 
     properties: {
-        boardName: {
-            default: null,
-            type: cc.Label
-        },
-        container: {
-            default: null,
-            type: cc.Node
-        },
-        scoreEntryPrefab: {
-            default: null,
-            type: cc.Prefab
-        }
+        boardName:        {type: cc.Label,  default: null},
+        container:        {type: cc.Node,   default: null},
+        scoreEntryPrefab: {type: cc.Prefab, default: null},
     },
 
     show() {
@@ -51,7 +42,48 @@ cc.Class({
             }, (rejected) => {
                 console.log(rejected);
             });
+        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            window.controller.getLeaderboardData().then((data) => {
+                console.log("game received data");
+                console.log(data);
+                for (let i = 0; i < this.container.children.length; i++) {
+                    this.container.children[i].destroy();
+                }
+                this.container.height = 108 * data.length + 50;
+
+                const entries = [];
+                for (const elem of data) {
+                    entries.push({
+                        name: elem.nickname,
+                        score: parseInt(JSON.parse(elem.KVDataList[0].value).wxgame.score, 10),
+                        avatar: elem.avatarUrl,
+                    });
+                }
+                entries.sort((a, b) => {
+                    if (a.score > b.score) {
+                        return -1;
+                    } else if (a.score < b.score) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                for (let i = 0; i < entries.length; i++) {
+                    const scoreEntry = cc.instantiate(this.scoreEntryPrefab);
+                    scoreEntry.getComponent("scoreBehaviour").setValues(entries[i].name, entries[i].score, i + 1, entries[i].avatar);
+                    this.container.addChild(scoreEntry);
+                    scoreEntry.y = -1 * (scoreEntry.height * (i + 0.5));
+                    scoreEntry.x = 0;
+                }
+            }).catch((reason) => {
+                console.log(">>>>>> promise rejected " + reason)
+            });
         }
+    },
+
+    dismiss() {
+        this.node.active = false;
     }
 
 });

@@ -2,8 +2,6 @@ import sdk from "./sdk/sdk";
 import Arrow from "./Arrow";
 import cfg from "./Constants";
 
-let brickId = 1;
-
 cc.Class({
     extends: cc.Component,
 
@@ -98,6 +96,10 @@ cc.Class({
         }
     },
 
+    getLeaderboardData() {
+        return sdk.fetchLeaderboardData("score", 0);
+    },
+
     findPrefabByName(key) {
         let whichPrefab = null;
         switch (key) {
@@ -156,19 +158,6 @@ cc.Class({
         this.nodePools[prefabName].put(obj);
     },
 
-    startGame() {
-        this.addScore(0);
-        this.loadBestScore();
-        this.guide.getComponent("guideBehaviour").phase(1);
-        this.loadLeaderboardScores();
-        this.addOneLevel();
-        this.gameRunning = true;
-        const newBullet = this.instantiatePrefab(cfg.KEY.BULLET, this.canvas);
-        this.bullets.push(newBullet);
-        newBullet.x = this.player.x;
-        newBullet.y = this.player.y + cfg.BULLET_PLAYER_OFFSET;
-    },
-
     loadLeaderboardScores() {
         if (typeof (FBInstant) != "undefined") {
             console.log(`current context = ${FBInstant.context.getID()}`);
@@ -194,6 +183,28 @@ cc.Class({
                 });
             }, (rejected) => {
                 console.log(rejected);
+            });
+        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            sdk.fetchLeaderboardData("score", 0).then((data) => {
+                console.log("load game received data");
+                console.log(data);
+                this.leaderboardScores.scores = [];
+                for (const elem of data) {
+                    this.leaderboardScores.scores.push({
+                        score: parseInt(JSON.parse(elem.KVDataList[0].value).wxgame.score, 10),
+                    });
+                }
+                this.leaderboardScores.scores.sort((a, b) => {
+                    if (a.score > b.score) {
+                        return -1;
+                    } else if (a.score < b.score) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+            }).catch((reason) => {
+                console.log(">>>>>> promise rejected " + reason);
             });
         }
         console.log(this.leaderboardScores);
@@ -221,6 +232,17 @@ cc.Class({
             }, (rejected) => {
                 console.log(rejected);
             });
+            this.loadLeaderboardScores();
+        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            sdk.fetchLeaderboardData("score", 2).then((data) => {
+                console.log("wx fetch user data success");
+                this.bestScore.string = data.toString();
+                this.memScore = data;
+                this.loadLeaderboardScores();
+            }).catch((reason) => {
+                console.log("wx loadBestScore failed, reason: " + reason);
+                this.loadLeaderboardScores();
+            });
         } else {
             let score = cc.sys.localStorage.getItem("score");
             if (score !== null && score !== "") {
@@ -229,6 +251,7 @@ cc.Class({
             } else {
                 this.bestScore.string = "0";
             }
+            this.loadLeaderboardScores();
         }
     },
 
@@ -260,7 +283,6 @@ cc.Class({
         this.maxBalls = 1;
         this.updateAllStickState();
         this.setScore(0);
-        this.loadLeaderboardScores();
         this.frameCounter = 0;
     },
 
@@ -303,6 +325,13 @@ cc.Class({
             }, (rejected) => {
                 console.log(rejected);
             });
+        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            console.log("start to upload score");
+            sdk.updateLeaderboardScore("score", this.memScore).then(() => {
+                console.log("score uploaded");
+            }).catch((reason) => {
+                console.log("score upload failed: " + reason);
+            });
         } else {
             cc.sys.localStorage.setItem("score", this.memScore.toString());
         }
@@ -331,6 +360,23 @@ cc.Class({
                         level = 3;
                     }
                 }
+            }
+        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            if (this.leaderboardScores.scores.length > 1) {
+                this.leaderboardScores.isContexed = true;
+            } else {
+                this.leaderboardScores.isContexed = false;
+            }
+            if (this.scoreValue < this.leaderboardScores.scores[0].score) {
+                level = 2;
+            } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
+                level = 0;
+            }
+            if (this.scoreValue < 5) {
+                level = 3;
+            }
+            if (this.memScore < this.scoreValue) {
+                this.memScore = this.scoreValue;
             }
         } else {
             if (this.scoreValue <= this.memScore) {
