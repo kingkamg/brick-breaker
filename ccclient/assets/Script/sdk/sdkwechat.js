@@ -8,6 +8,7 @@ const PostMsgType = {
   ShowNearbyFriend: 'showNearbyFriend',
   ShowTopFriend: 'showTopFriend',
   UpdateRankData: 'UpdateRankData',
+  HKDone: "HKDone",
   HKShowRank: 'HKshowRank',
   HKShowNearbyFriend: 'HKshowNearbyFriend',
   HKShowTopFriend: 'HKshowTopFriend',
@@ -28,7 +29,19 @@ const RankType = {
   Self: 2,
 }
 
-const canvasSize = 50
+const WXHK = {
+  /**
+   * 离屏画布的边长，数据最大长度为该值的平方 * 1.5
+   */
+  canvasSize: 50,
+  /**
+   * 检查离屏画布的时间间隔，单位：毫秒
+   */
+  tick: 100,
+  tasks: [],
+  idInc: 0,
+  renderer: new cc.RenderTexture(),
+}
 
 var sdkWechat = cc.Class({
   extends: SDKBase,
@@ -55,23 +68,29 @@ var sdkWechat = cc.Class({
 
   // 每0.1秒获取离屏canvas数据（如果有任务）
   _checkSharedCanvas: function () {
-    if (this.wxhkResolver === null) {
+    if (WXHK.tasks.length === 0) {
       return
     }
 
-    this.renderTexture.initWithSize(canvasSize, canvasSize)
-    this.renderTexture.initWithElement(wx.getOpenDataContext().canvas)
-    let data = new Uint8Array(canvasSize * canvasSize * 4)
-    this.renderTexture.readPixels(data, 0, 0, canvasSize, canvasSize)
+    WXHK.renderer.initWithSize(WXHK.canvasSize, WXHK.canvasSize)
+    WXHK.renderer.initWithElement(wx.getOpenDataContext().canvas)
+    let data = new Uint8Array(WXHK.canvasSize * WXHK.canvasSize * 4)
+    WXHK.renderer.readPixels(data, 0, 0, WXHK.canvasSize, WXHK.canvasSize)
 
     const dataMsgId = (data[0] << 16) | (data[1] << 8) | (data[2])
-    if (dataMsgId < this.wxhkTaskID) {
+    let task = WXHK.tasks[0]
+    if (dataMsgId < task.id) {
+      // 还没画完
       return
-    } else if (dataMsgId < this.wxhkTaskID) {
-      this.wxhkRejector("WXHK: 数据任务ID大于当前进度")
-      this.wxhkResolver = null
-      this.wxhkRejector = null
-      return
+    }
+    task = WXHK.tasks.shift()
+    while (task.id < dataMsgId) {
+      task.reject("wxhk: 错误，有数据画漏了")
+      task = WXHK.tasks.shift()
+      if (task === undefined) {
+        console.warn("wxhk: 画布有数据，但是没有任务去读，数据被丢弃")
+        return
+      }
     }
 
     const buf = []
@@ -100,15 +119,17 @@ var sdkWechat = cc.Class({
     try {
       let obj = JSON.parse(stringBuffer)
       if (obj.status === 200) {
-        this.wxhkResolver(obj.data)
+        console.log("wxhk: resolve 成功返回数据")
+        task.resolve(obj.data)
       } else {
-        this.wxhkRejector("WXHK: 通讯正常，但是wx接口获取数据失败，原因: " + obj.reason)
+        task.reject("wxhk: reject 读画布成功，但是wx接口获取数据失败，原因: " + obj.reason)
       }
     } catch(e) {
-      this.wxhkRejector("WXHK: 数据损坏: " + stringBuffer)
+      task.reject("wxhk: reject 数据损坏: " + stringBuffer)
     }
-    this.wxhkResolver = null
-    this.wxhkRejector = null
+    wx.getOpenDataContext().postMessage({
+      msgType: PostMsgType.HKDone,
+    })
   },
 
   ctor : function () {
@@ -123,11 +144,7 @@ var sdkWechat = cc.Class({
     })
 
     // 每0.1秒获取离屏canvas数据（如果有任务）
-    this.wxhkTaskID = 0
-    this.renderTexture = new cc.RenderTexture()
-    this.wxhkResolver = null
-    this.wxhkRejector = null
-    setInterval(this._checkSharedCanvas.bind(this), 100)
+    setInterval(this._checkSharedCanvas.bind(this), WXHK.tick)
   },
 
   // 获取支持登陆的所有SDK名称
@@ -243,15 +260,10 @@ var sdkWechat = cc.Class({
    * @override
    */
   fetchLeaderboardData(whichBoard, rankType) {
-    if (this.wxhkResolver !== null || this.wxhkRejector !== null) {
-      this.wxhkRejector("WXHK: 被新任务覆盖")
-      this.wxhkResolver = null
-      this.wxhkRejector = null
-    }
-    this.wxhkTaskID ++
+    WXHK.idInc ++
     wx.getOpenDataContext().postMessage({
       msgType: PostMsgType.HKShowRank,
-      msgId: this.wxhkTaskID,
+      msgId: WXHK.idInc,
       data: {
         rankType: rankType,
         params: {
@@ -260,8 +272,11 @@ var sdkWechat = cc.Class({
       }
     })
     return new Promise((resolve, reject) => {
-      this.wxhkResolver = resolve
-      this.wxhkRejector = reject
+      WXHK.tasks.push({
+        id: WXHK.idInc,
+        resolve: resolve,
+        reject: reject,
+      })
     })
   },
 
