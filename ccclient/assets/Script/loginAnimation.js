@@ -1,4 +1,4 @@
-cc.Class({
+module.exports = cc.Class({
     extends: cc.Component,
 
     properties: {
@@ -77,4 +77,11 @@ cc.Class({
             }
         }
     },
+
+    tiktok(dir) {
+        for (let i = 0; i < this.blocks.length; i++) {
+            this.blocks[i].getComponent("animeBlock").tiktokOnce(dir);
+        }
+    }
+
 });

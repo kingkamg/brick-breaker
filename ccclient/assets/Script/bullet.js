@@ -4,10 +4,9 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        sound: {
-            type: cc.AudioClip,
-            default: null
-        },
+        sound: {type: cc.AudioClip, default: null},
+        tik:   {type: cc.Node, default: null},
+        tok:   {type: cc.Node, default: null},
         velocity: new cc.Vec2(),
         sticked: false,
         launchTime: -1,
@@ -52,6 +51,7 @@ cc.Class({
     freeze() {
         this.velocity = new cc.Vec2(0, 0);
         this.sticked = true;
+        this.resetTiktok();
         window.controller.updateAllStickState();
     },
 
@@ -132,6 +132,23 @@ cc.Class({
         const box2 = cc.v2(ox + ow, oy - oh);
         const box3 = cc.v2(ox + ow, oy + oh);
         this.reflect(p, [box0, box1, box2, box3]);
+        // tiktok
+        if (window.controller.tiktok && other.tag !== 99) {
+            const dir = this.velocity.clone();
+            dir.normalizeSelf().mulSelf(4.5);
+            this.tik.x = dir.x;
+            this.tik.y = dir.y;
+            this.tok.x = -dir.x;
+            this.tok.y = -dir.y;
+            window.controller.bgAnime.tiktok(8);
+        }
     },
+
+    resetTiktok() {
+        this.tik.x = 0;
+        this.tik.y = 0;
+        this.tok.x = 0;
+        this.tok.y = 0;
+    }
 
 });

@@ -36,7 +36,11 @@ cc.Class({
     },
 
     onCollisionEnter(other, self) {
-        window.controller.addScore(1);
+        let score = 1;
+        if (window.controller.tiktok) {
+            score *= 2;
+        }
+        window.controller.addScore(score);
         let componentName = "brickNormal";
         switch (this.brickType) {
             case cfg.KEY.PU_BALL: {

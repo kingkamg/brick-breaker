@@ -1,6 +1,8 @@
 import sdk from "./sdk/sdk";
 import Arrow from "./Arrow";
 import cfg from "./Constants";
+import TiktokNotification from "./TiktokNotification";
+const loginAnimation = require("./loginAnimation");
 
 cc.Class({
     extends: cc.Component,
@@ -28,6 +30,9 @@ cc.Class({
         powerUpEnlargePrefab: {type: cc.Prefab,  default: null},
         powerUpBoom:          {type: cc.Prefab,  default: null},
         plusOnePrefab:        {type: cc.Prefab,  default: null},
+        bgAnime:              {type: loginAnimation,  default: null},
+        tiktokNotif:          {type: TiktokNotification,  default: null},
+        tiktokEnd:            {type: cc.Node,  default: null},
         maxBalls:             1,
         colors:               {type: [cc.color], default: []},
         scoreValue:           0,
@@ -37,6 +42,8 @@ cc.Class({
         frameCounter:         0,
         fixedFPS:             30,
         frameCap:             0,
+        tiktok:               false,
+        tiktokTime:           10,
     },
 
     onLoad() {
@@ -88,7 +95,7 @@ cc.Class({
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
             sdk.setShareInfoCallback(() => {
                 return {
-                    imageUrl: "sdkAssets/longzhu.png",
+                    imageUrl: "sdkAssets/longzhu.jpg",
                     query: "",
                     title: "好气，差一点就集齐了，帮帮我！",
                 };
@@ -412,7 +419,11 @@ cc.Class({
         while (i --) {
             const element = this.bricks[i];
             if (Math.abs(element.y - lowest) < 10) {
-                element.getComponent("brick").kaboom();
+                const brickBehav = element.getComponent("brick");
+                if (brickBehav.brickType === cfg.KEY.BRICK) {
+                    this.addScore(element.getComponent("brickNormal").hp);
+                }
+                brickBehav.kaboom();
             }
         }
     },
@@ -530,6 +541,14 @@ cc.Class({
                 elem.getComponent("bullet").updateManually(this.frameCap);
             }
         }
+        // tik tok effect
+        if (this.tiktokTimer > 0) {
+            this.tiktokTimer -= dt;
+            if (this.tiktokTimer <= 0) {
+                this.tiktok = true;
+                this.tiktokNotif.show();
+            }
+        }
     },
 
     onDragged(e) {
@@ -547,7 +566,9 @@ cc.Class({
             for (let i = 0; i < this.bullets.length; i++) {
                 this.bullets[i].getComponent("bullet").launchIn(dir.x, dir.y, (i + 1) * 0.1);
             }
+            this.tiktokTimer = this.tiktokTime;
             this.allSticked = false;
+            console.log("reset tiktok timer = " + this.tiktokTimer);
             this.arrow.dismiss();
             this.state = "moving";
         } else if (this.state == "moving" && this.allSticked === true) {
@@ -577,6 +598,17 @@ cc.Class({
                 this.allSticked = true;
                 if (this.gameRunning === true) {
                     this.addOneLevel();
+                    // notif
+                    if (this.tiktok) {
+                        this.tiktokEnd.active = true;
+                        this.tiktokEnd.y = -230;
+                        this.tiktokEnd.opacity = 255;
+                        const fadeout = cc.fadeOut(2.0);
+                        const moveup = cc.moveBy(2.0, cc.v2(0, 100));
+                        this.tiktokEnd.runAction(cc.spawn(fadeout, moveup));
+                    }
+                    this.tiktok = false;
+                    this.tiktokTimer = -0.1;
                 }
             }
         }
