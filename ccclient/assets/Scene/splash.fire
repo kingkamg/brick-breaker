@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.42421875,
-      "y": 0.42421875,
+      "x": 0.4125,
+      "y": 0.4125,
       "z": 1
     },
     "_quat": {
@@ -52,7 +52,7 @@
       "z": 0,
       "w": 1
     },
-    "_localZOrder": 152,
+    "_localZOrder": 153,
     "groupIndex": 0,
     "autoReleaseAssets": false,
     "_id": "6f822d9c-c494-451f-9184-eb8474ea9fc8"
@@ -127,7 +127,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 153,
+    "_localZOrder": 154,
     "groupIndex": 0,
     "_id": "56xU4dt9pPHZpqO8XKqx2X"
   },
@@ -188,7 +188,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 154,
+    "_localZOrder": 155,
     "groupIndex": 0,
     "_id": "1bmknnlQZDNaziUD6cOe1I"
   },
@@ -274,7 +274,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 155,
+    "_localZOrder": 156,
     "groupIndex": 0,
     "_id": "7aU+w8+ORHjowTx0OZlzt+"
   },
@@ -387,7 +387,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 156,
+    "_localZOrder": 157,
     "groupIndex": 0,
     "_id": "e1VDDQ239OrLtbq5auOGW/"
   },
