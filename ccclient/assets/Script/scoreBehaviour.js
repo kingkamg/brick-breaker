@@ -43,7 +43,6 @@ cc.Class({
                 console.log("load avatar failed", err);
             } else {
                 this.avatarImage.spriteFrame = new cc.SpriteFrame(tex);
-                console.log("setting image");
             }
         });
     }

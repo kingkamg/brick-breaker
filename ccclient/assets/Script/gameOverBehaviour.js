@@ -25,7 +25,7 @@ cc.Class({
     },
     
     show(contexted, level) {
-        console.log(contexted, level);
+        console.log(`Is contexted: ${contexted}, comment level ${level}`);
         switch (level) {
             case 0:
                 this.trophy.active = true;

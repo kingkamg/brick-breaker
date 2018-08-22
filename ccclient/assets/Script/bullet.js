@@ -140,7 +140,6 @@ cc.Class({
             this.tik.y = dir.y;
             this.tok.x = -dir.x;
             this.tok.y = -dir.y;
-            window.controller.bgAnime.tiktok(8);
         }
     },
 

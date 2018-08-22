@@ -11,6 +11,9 @@ export default {
         PU_ENLARGE: "PU_ENLARGE",
         SFX_KABOOM: "SFX_KABOOM",
     },
+    PLAYER_LENGTH: 250,
+    PLAYER_LENGTH_MAX: 450,
+    PLAYER_LENGTH_STEP: 20,
     POOL_SIZES: {
         BRICK: 32,
         BULLET: 20,

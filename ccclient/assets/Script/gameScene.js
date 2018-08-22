@@ -1,4 +1,5 @@
 import LoginUIAnime from "./LoginUIAnime";
+import cfg from "./Constants";
 const leaderboardBehaviour = require("./leaderboard");
 
 cc.Class({
@@ -31,7 +32,7 @@ cc.Class({
         this.gameUINode.active = false;
         window.controller.destroyAllLevels();
         window.controller.player.x = 0;
-        window.controller.player.getComponent("player").setLengthz(210)
+        window.controller.player.getComponent("player").setLengthz(cfg.PLAYER_LENGTH);
         window.controller.gameRunning = false;
     }
 

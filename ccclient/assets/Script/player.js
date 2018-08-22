@@ -1,3 +1,5 @@
+import cfg from "./Constants";
+
 cc.Class({
     extends: cc.Component,
 
@@ -22,7 +24,7 @@ cc.Class({
     },
 
     enlarge() {
-        this.setLengthz(this.lengthz + 30);
+        this.setLengthz(this.lengthz + cfg.PLAYER_LENGTH_STEP);
     },
 
     updateNumber(val) {
@@ -33,8 +35,8 @@ cc.Class({
         if (val < 90) {
             val = 90;
         }
-        if (val > 500) {
-            val = 500;
+        if (val > cfg.PLAYER_LENGTH_MAX) {
+            val = cfg.PLAYER_LENGTH_MAX;
         }
         this.lengthz = val;
         this.left.x = (this.lengthz - 30) * -0.5;

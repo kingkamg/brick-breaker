@@ -1,8 +1,6 @@
 import sdk from "./sdk/sdk";
 import Arrow from "./Arrow";
 import cfg from "./Constants";
-import TiktokNotification from "./TiktokNotification";
-const loginAnimation = require("./loginAnimation");
 
 cc.Class({
     extends: cc.Component,
@@ -30,9 +28,7 @@ cc.Class({
         powerUpEnlargePrefab: {type: cc.Prefab,  default: null},
         powerUpBoom:          {type: cc.Prefab,  default: null},
         plusOnePrefab:        {type: cc.Prefab,  default: null},
-        bgAnime:              {type: loginAnimation,  default: null},
-        tiktokNotif:          {type: TiktokNotification,  default: null},
-        tiktokEnd:            {type: cc.Node,  default: null},
+        bgAnime:              {type: cc.Node,  default: null},
         maxBalls:             1,
         colors:               {type: [cc.color], default: []},
         scoreValue:           0,
@@ -53,6 +49,11 @@ cc.Class({
             5, 5, 5, 5, 5,
             6, 6, 6,
             7,
+        ];
+        this.powerupsPool = [
+            0,
+            1, 1, 1, 1, 1,
+            2, 2, 2
         ];
         this.colors = [
             new cc.color(241, 196, 15),
@@ -264,7 +265,7 @@ cc.Class({
 
     restart() {
         this.currentLevel = 0;
-        this.player.getComponent("player").setLengthz(210);
+        this.player.getComponent("player").setLengthz(cfg.PLAYER_LENGTH);
         this.loadBestScore();
         this.guide.getComponent("guideBehaviour").phase(1);
         this.gameRunning = true;
@@ -342,6 +343,14 @@ cc.Class({
         } else {
             cc.sys.localStorage.setItem("score", this.memScore.toString());
         }
+    },
+
+    resetMyScore() {
+        sdk.updateLeaderboardScore("score", 0).then(() => {
+            console.log("score reset");
+        }).catch((reason) => {
+            console.log("score reset failed: " + reason);
+        });
     },
 
     gameEnd() {
@@ -448,7 +457,7 @@ cc.Class({
         }
         // add one layer
         let n = this.bricksPool[Math.floor(Math.random() * this.bricksPool.length)];
-        const powerUp = Math.floor(Math.random() * 3);
+        const powerUp = this.powerupsPool[Math.floor(Math.random() * this.powerupsPool.length)];
         n -= powerUp;
         const pool = [];
         for (let i = 0; i < n; i++) {
@@ -457,7 +466,7 @@ cc.Class({
         let alreadyPutBoom = false;
         for (let i = 0; i < powerUp; i++) {
             if (this.currentLevel > 15 && alreadyPutBoom === false) {
-                if (Math.random() < 0.5) {
+                if (Math.random() < 0.3) {
                     pool.push(4);
                 } else {
                     pool.push(2);
@@ -480,10 +489,7 @@ cc.Class({
             switch (pool[index]) {
                 case 1: {
                     brick = this.instantiatePrefab(cfg.KEY.BRICK, this.levelContainer);
-                    let hp = this.maxBalls;
-                    if (hp > this.bullets.length) {
-                        hp = hp * 0.8;
-                    }
+                    let hp = this.bullets.length + (this.maxBalls - this.bullets.length) * (0.5 + this.currentLevel * 0.01);
                     if (doubled === false) {
                         if (Math.random() < 0.15) {
                             hp *= 2;
@@ -546,7 +552,7 @@ cc.Class({
             this.tiktokTimer -= dt;
             if (this.tiktokTimer <= 0) {
                 this.tiktok = true;
-                this.tiktokNotif.show();
+                console.log("tiktok enabled");
             }
         }
     },
@@ -568,7 +574,6 @@ cc.Class({
             }
             this.tiktokTimer = this.tiktokTime;
             this.allSticked = false;
-            console.log("reset tiktok timer = " + this.tiktokTimer);
             this.arrow.dismiss();
             this.state = "moving";
         } else if (this.state == "moving" && this.allSticked === true) {
@@ -591,27 +596,18 @@ cc.Class({
                 }
             }
             this.player.getComponent("player").updateNumber(count);
-            if (this.maxBalls < count) {
-                this.maxBalls = count;
-            }
             if (count === this.bullets.length) {
                 this.allSticked = true;
                 if (this.gameRunning === true) {
                     this.addOneLevel();
                     // notif
                     if (this.tiktok) {
-                        this.tiktokEnd.active = true;
-                        this.tiktokEnd.y = -230;
-                        this.tiktokEnd.opacity = 255;
-                        const fadeout = cc.fadeOut(2.0);
-                        const moveup = cc.moveBy(2.0, cc.v2(0, 100));
-                        this.tiktokEnd.runAction(cc.spawn(fadeout, moveup));
+                        console.log("tiktok end");
                     }
                     this.tiktok = false;
-                    this.tiktokTimer = -0.1;
                 }
             }
         }
-    }
+    },
 
 });

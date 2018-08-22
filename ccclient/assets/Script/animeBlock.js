@@ -2,15 +2,12 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        tik: {type: cc.Node, default: null},
-        tok: {type: cc.Node, default: null},
     },
 
     onLoad () {
         this.time = -1;
         this.scale = 1;
         this.bulge = 0;
-        this.tiktok = 0;
         this.dir = 0;
     },
 
@@ -45,13 +42,6 @@ cc.Class({
             }
             this.bulge -= dt;
         }
-        if (this.tiktok > 0) {
-            this.tiktok -= dt;
-            this.tik.x = this.dir * this.tiktok / 0.12;
-            this.tik.y = this.dir * this.tiktok / 0.12;
-            this.tok.x = -this.dir * this.tiktok / 0.12;
-            this.tok.y = -this.dir * this.tiktok / 0.12;
-        }
     },
 
     setScale(x) {
@@ -72,17 +62,6 @@ cc.Class({
 
     bulgeOnce() {
         this.bulge = 0.05;
-    },
-
-    tiktokOnce(dir) {
-        if (this.tiktok <= 0) {
-            this.tiktok = 0.12;
-            this.dir = dir;
-            this.tik.x = dir;
-            this.tik.y = dir;
-            this.tok.x = -dir;
-            this.tok.y = -dir;
-        }
     },
 
 });

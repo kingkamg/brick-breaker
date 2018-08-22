@@ -18,6 +18,9 @@ cc.Class({
         bulletBehaviour.sticked = false;
         window.controller.bullets.push(newBullet);
 
+        // add max balls
+        window.controller.maxBalls ++;
+
         // visual effect + 1
         const visualPlus1 = window.controller.instantiatePrefab(cfg.KEY.PLUS_ONE, window.controller.canvas);
         visualPlus1.x = this.node.x;
