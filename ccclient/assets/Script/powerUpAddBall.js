@@ -13,8 +13,8 @@ cc.Class({
         const newBullet = window.controller.instantiatePrefab(cfg.KEY.BULLET, window.controller.canvas);
         newBullet.x = this.node.x;
         newBullet.y = this.node.y;
+        newBullet.getComponent(cc.RigidBody).linearVelocity = ball.node.getComponent(cc.RigidBody).linearVelocity.clone();
         const bulletBehaviour = newBullet.getComponent("bullet");
-        bulletBehaviour.velocity = ball.getComponent("bullet").velocity.clone();
         bulletBehaviour.sticked = false;
         window.controller.bullets.push(newBullet);
 

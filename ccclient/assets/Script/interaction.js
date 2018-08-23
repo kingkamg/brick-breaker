@@ -11,6 +11,7 @@ cc.Class({
         arrow:                {type: Arrow,      default: null},
         bullets:              {type: [cc.Node],  default: []},
         bricks:               {type: [cc.Node],  default: []},
+        walls:                {type: [cc.Node],  default: []},
         levelContainer:       {type: cc.Node,    default: null},
         score:                {type: cc.Label,   default: null},
         scoreBuldge:          0,
@@ -89,6 +90,13 @@ cc.Class({
         }
         // Arrow
         this.arrow.init();
+        // physics
+        const physics = cc.director.getPhysicsManager();
+        physics.enabled = true;
+        physics.gravity = cc.v2(0);
+        physics.enabledAccumulator = true;
+        physics.FIXED_TIME_STEP = 1/30;
+        physics.PTM_RATIO = 32;
         // sdk
         sdk.init();
         sdk.onUserNoLogin();
@@ -447,7 +455,7 @@ cc.Class({
         let lowest = 1000;
         for (let i = 0; i < this.bricks.length; i++) {
             const element = this.bricks[i];
-            element.y -= 100;
+            element.runAction(cc.moveBy(0.0, cc.v2(0, -100)));
             if (element.y < lowest) {
                 lowest = element.y
             }
@@ -538,14 +546,6 @@ cc.Class({
             }
             this.score.node.scaleX = this.scoreBuldge + 1;
             this.score.node.scaleY = this.scoreBuldge + 1;
-        }
-        // fixed manual frame
-        this.frameCounter += dt;
-        if (this.frameCounter >= this.frameCap) {
-            this.frameCounter %= this.frameCap;
-            for (const elem of this.bullets) {
-                elem.getComponent("bullet").updateManually(this.frameCap);
-            }
         }
         // tik tok effect
         if (this.tiktokTimer > 0) {

@@ -1,12 +1,13 @@
 import cfg from "./Constants";
+import MathToolkit from "./MathToolkit";
 
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        sound: {type: cc.AudioClip, default: null},
-        tik:   {type: cc.Node, default: null},
-        tok:   {type: cc.Node, default: null},
+        sound: { type: cc.AudioClip, default: null },
+        tik: { type: cc.Node, default: null },
+        tok: { type: cc.Node, default: null },
         velocity: new cc.Vec2(),
         sticked: false,
         launchTime: -1,
@@ -15,34 +16,29 @@ cc.Class({
         uselessCollide: 0
     },
 
-    onLoad() {
-        const manager = cc.director.getCollisionManager();
-        manager.enabled = true;
-    },
-
-    updateManually(dt) {
+    update(dt) {
         if (this.sticked === true) {
             this.node.x = window.controller.player.x;
             this.node.y = window.controller.player.y + cfg.BULLET_PLAYER_OFFSET;
-        } else {
-            this.node.x += this.velocity.x * dt;
-            this.node.y += this.velocity.y * dt;
-            if (this.node.y < -660 || this.node.y > 660 || this.node.x < -380 || this.node.x > 380) {
-                const index = window.controller.bullets.indexOf(this.node);
-                if (index != -1) {
-                    window.controller.bullets.splice(index, 1);
-                } else {
-                    console.warn("bullets not in controller");
-                }
-                window.controller.recyclePrefab(cfg.KEY.BULLET, this.node);
-                window.controller.updateAllStickState();
+        }
+        if (this.node.y < -660 || this.node.y > 660 || this.node.x < -380 || this.node.x > 380) {
+            const index = window.controller.bullets.indexOf(this.node);
+            if (index != -1) {
+                window.controller.bullets.splice(index, 1);
+            } else {
+                console.warn("bullets not in controller");
             }
+            window.controller.recyclePrefab(cfg.KEY.BULLET, this.node);
+            window.controller.updateAllStickState();
         }
         if (this.launchTime > 0) {
             this.launchTime -= dt;
             if (this.launchTime <= 0) {
                 this.sticked = false;
                 this.velocity = new cc.Vec2(this.savedx, this.savedy);
+                const rigidbody = this.node.getComponent(cc.RigidBody);
+                rigidbody.awake = true;
+                rigidbody.linearVelocity = this.velocity;
                 window.controller.updateAllStickState();
             }
         }
@@ -50,6 +46,9 @@ cc.Class({
 
     freeze() {
         this.velocity = new cc.Vec2(0, 0);
+        const rigidbody = this.node.getComponent(cc.RigidBody);
+        rigidbody.awake = false;
+        rigidbody.linearVelocity = this.velocity;
         this.sticked = true;
         this.resetTiktok();
         window.controller.updateAllStickState();
@@ -120,22 +119,20 @@ cc.Class({
         this.velocity = reflection;
     },
 
-    onCollisionEnter(other, self) {
+    onPostSolve(contact, selfCollider, otherCollider) {
         cc.audioEngine.play(this.sound, false, 1);
-        const p = cc.v2(self.node.x, self.node.y);
-        const ox = other.node.x;
-        const oy = other.node.y;
-        const ow = other.node.width;
-        const oh = other.node.height;
-        const box0 = cc.v2(ox - ow, oy + oh);
-        const box1 = cc.v2(ox - ow, oy - oh);
-        const box2 = cc.v2(ox + ow, oy - oh);
-        const box3 = cc.v2(ox + ow, oy + oh);
-        this.reflect(p, [box0, box1, box2, box3]);
+        if (otherCollider.tag === 0) {
+            otherCollider.node.getComponent("brick").takeHit(this);
+        }
+        if (otherCollider.tag === 2) {
+            this.freeze();
+        }
         // tiktok
-        if (window.controller.tiktok && other.tag !== 99) {
-            const dir = this.velocity.clone();
+        if (window.controller.tiktok && otherCollider.tag !== 2) {
+            const rigidbody = this.node.getComponent(cc.RigidBody);
+            const dir = rigidbody.linearVelocity.clone();
             dir.normalizeSelf().mulSelf(4.5);
+            console.log("tiktok?")
             this.tik.x = dir.x;
             this.tik.y = dir.y;
             this.tok.x = -dir.x;
@@ -148,6 +145,6 @@ cc.Class({
         this.tik.y = 0;
         this.tok.x = 0;
         this.tok.y = 0;
-    }
+    },
 
 });

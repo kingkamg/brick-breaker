@@ -7,11 +7,6 @@ cc.Class({
         brickType: "BRICK"
     },
 
-    onLoad () {
-        const manager = cc.director.getCollisionManager();
-        manager.enabled = true;
-    },
-
     kaboom() {
         // create explosion
         const explosion = window.controller.instantiatePrefab(cfg.KEY.SFX_KABOOM, window.controller.canvas);
@@ -35,7 +30,7 @@ cc.Class({
         window.controller.recyclePrefab(this.brickType, this.node);
     },
 
-    onCollisionEnter(other, self) {
+    takeHit(other) {
         let score = 1;
         if (window.controller.tiktok) {
             score *= 2;

@@ -34,10 +34,13 @@
       },
       {
         "__id__": 12
+      },
+      {
+        "__id__": 13
       }
     ],
     "_prefab": {
-      "__id__": 13
+      "__id__": 14
     },
     "_opacity": 255,
     "_color": {
@@ -80,7 +83,7 @@
     },
     "_skewX": 0,
     "_skewY": 0,
-    "_localZOrder": 81,
+    "_localZOrder": 166,
     "groupIndex": 1,
     "_id": ""
   },
@@ -173,7 +176,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "84JL+033ZDXp9vNLcVoJkc"
+    "_id": "b0bY2vpLxMt429PpWQhKhv"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -275,7 +278,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "02Y9VIq0hMBLIGXSa2xRDr"
+    "_id": "a2tq0Z5WZA1LPMfwnutVqk"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -377,7 +380,7 @@
     "_isTrimmedMode": true,
     "_state": 0,
     "_atlas": null,
-    "_id": "f5aBRqLdFMNYgxEvdDZDk/"
+    "_id": "d4TYM6g6JCza0JrJndO/kj"
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -417,10 +420,34 @@
     "savedx": 0,
     "savedy": 0,
     "uselessCollide": 0,
-    "_id": "dczdVcrkFNAZmRkzC4psWn"
+    "_id": "ca8rO29StHs7lKxfWNDDCI"
   },
   {
-    "__type__": "cc.CircleCollider",
+    "__type__": "cc.RigidBody",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 1
+    },
+    "_enabled": true,
+    "_type": 2,
+    "_allowSleep": true,
+    "_gravityScale": 1,
+    "_linearDamping": 0,
+    "_angularDamping": 0,
+    "_linearVelocity": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
+    },
+    "_angularVelocity": 0,
+    "_fixedRotation": false,
+    "enabledContactListener": true,
+    "bullet": true,
+    "_id": "78dBxb3utKxIkoAgC89Jln"
+  },
+  {
+    "__type__": "cc.PhysicsCircleCollider",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -428,13 +455,18 @@
     },
     "_enabled": true,
     "tag": 0,
+    "_density": 1,
+    "_sensor": false,
+    "_friction": 0,
+    "_restitution": 1,
+    "body": null,
     "_offset": {
       "__type__": "cc.Vec2",
       "x": 0,
       "y": 0
     },
     "_radius": 15,
-    "_id": "c6p5bl7gVCZ7GLCkF6JwEi"
+    "_id": "44YmuvobhIiL6JQ9daispT"
   },
   {
     "__type__": "cc.PrefabInfo",

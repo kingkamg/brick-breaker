@@ -40,7 +40,8 @@
     "PageView",
     "PageViewIndicator",
     "Slider",
-    "Physics"
+    "EditBox",
+    "Animation"
   ],
   "fit-height": true,
   "fit-width": false,

@@ -42,7 +42,7 @@ cc.Class({
         this.left.x = (this.lengthz - 30) * -0.5;
         this.right.x = (this.lengthz - 30) * 0.5;
         this.center.width = this.lengthz - 30;
-        this.center.getComponent(cc.BoxCollider).size.width = this.lengthz;
+        this.node.getComponent(cc.PhysicsBoxCollider).size = new cc.Size(val, 30);
     },
 
     setPosition(deltaX) {
