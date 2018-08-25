@@ -10,6 +10,7 @@ const PostMsgType = {
   UpdateRankData: 'UpdateRankData',
   HKDone: "HKDone",
   HKShowRank: 'HKshowRank',
+  HKGetUserInfo: 'HKGetUserInfo',
   HKShowNearbyFriend: 'HKshowNearbyFriend',
   HKShowTopFriend: 'HKshowTopFriend',
 }
@@ -33,7 +34,7 @@ const WXHK = {
   /**
    * 离屏画布的边长，数据最大长度为该值的平方 * 1.5
    */
-  canvasSize: 50,
+  canvasSize: 100,
   /**
    * 检查离屏画布的时间间隔，单位：毫秒
    */
@@ -78,21 +79,18 @@ var sdkWechat = cc.Class({
     WXHK.renderer.readPixels(data, 0, 0, WXHK.canvasSize, WXHK.canvasSize)
 
     const dataMsgId = (data[0] << 16) | (data[1] << 8) | (data[2])
-    let task = WXHK.tasks[0]
-    if (dataMsgId < task.id) {
-      // 还没画完
-      return
-    }
-    task = WXHK.tasks.shift()
-    while (task.id < dataMsgId) {
-      task.reject("wxhk: 错误，有数据画漏了")
-      task = WXHK.tasks.shift()
-      if (task === undefined) {
-        console.warn("wxhk: 画布有数据，但是没有任务去读，数据被丢弃")
-        return
+
+    let index
+    for (index = 0; index < WXHK.tasks.length; index++) {
+      if (dataMsgId === WXHK.tasks[index].id) {
+        break
       }
     }
+    if (index >= WXHK.tasks.length) {
+      return
+    }
 
+    const task = WXHK.tasks.splice(index, 1)[0]
     const buf = []
     let stringBuffer = ""
     let eof = false
@@ -119,13 +117,13 @@ var sdkWechat = cc.Class({
     try {
       let obj = JSON.parse(stringBuffer)
       if (obj.status === 200) {
-        console.log("wxhk: resolve 成功返回数据")
+        console.log("wxhk: resolve 成功返回数据, msgId", task.id)
         task.resolve(obj.data)
       } else {
-        task.reject("wxhk: reject 读画布成功，但是wx接口获取数据失败，原因: " + obj.reason)
+        task.reject("wxhk: reject 读画布成功 msgId", task.id, "但是wx接口获取数据失败，原因: " + obj.reason)
       }
     } catch(e) {
-      task.reject("wxhk: reject 数据损坏: " + stringBuffer)
+      task.reject("wxhk: reject 数据损坏 msgId", task.id, "结果", stringBuffer)
     }
     wx.getOpenDataContext().postMessage({
       msgType: PostMsgType.HKDone,
@@ -183,7 +181,7 @@ var sdkWechat = cc.Class({
 
   // 是否支付Banner广告
   supportBannerAd: function () {
-    return false
+    return true
   },
 
   // 是否支付插屏广告
@@ -193,7 +191,7 @@ var sdkWechat = cc.Class({
 
   // 是否支付视频广告
   supportVideoAd: function () {
-    return false
+    return true
   },
 
   // 是否支持排行榜
@@ -268,6 +266,26 @@ var sdkWechat = cc.Class({
         rankType: rankType,
         params: {
           keyList: [whichBoard],
+        }
+      }
+    })
+    return new Promise((resolve, reject) => {
+      WXHK.tasks.push({
+        id: WXHK.idInc,
+        resolve: resolve,
+        reject: reject,
+      })
+    })
+  },
+
+  fetchUserInfo() {
+    WXHK.idInc ++
+    wx.getOpenDataContext().postMessage({
+      msgType: PostMsgType.HKGetUserInfo,
+      msgId: WXHK.idInc,
+      data: {
+        params: {
+          openIdList: ["selfOpenId"]
         }
       }
     })

@@ -7,7 +7,8 @@ cc.Class({
     onLoad () {
         this.time = -1;
         this.scale = 1;
-        this.bulge = 0;
+        this.bulge = -1;
+        this.shadeChange = 0;
         this.dir = 0;
     },
 
@@ -42,6 +43,16 @@ cc.Class({
             }
             this.bulge -= dt;
         }
+        if (window.controller.tiktok) {
+            if (this.shadeChange > -0.05) {
+                if (this.shadeChange > 0) {
+                    this.node.opacity -= dt * 1800;
+                } else {
+                    this.node.opacity += dt * 1800;
+                }
+                this.shadeChange -= dt;
+            }
+        }
     },
 
     setScale(x) {
@@ -63,5 +74,10 @@ cc.Class({
     bulgeOnce() {
         this.bulge = 0.05;
     },
+
+    shadeOnce() {
+        this.node.opacity = 255;
+        this.shadeChange = 0.05;
+    }
 
 });

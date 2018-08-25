@@ -2,18 +2,10 @@ module.exports = cc.Class({
     extends: cc.Component,
 
     properties: {
-        block: {
-            default: null,
-            type: cc.Prefab
-        },
-        blocks: {
-            default: [],
-            type: [cc.Node]
-        },
-        level: {
-            default: null,
-            type: cc.Node
-        },
+        block: { type: cc.Prefab, default: null, },
+        blocks: { type: [cc.Node], default: [], },
+        level: { type: cc.Node, default: null, },
+        tiktokFrame: { type: cc.Node, default: null },
         rows: 5,
         cols: 5,
         gap: 190,
@@ -22,13 +14,15 @@ module.exports = cc.Class({
         rotationBeats: 8,
         flipSizeBeats: 4,
         bulgeOnceBeats: 1,
+        frameBeats: 1,
     },
 
-    onLoad () {
+    onLoad() {
         this.rotate = 0;
         this.rotationSum = 0;
         this.flipSizeSum = 0;
         this.bulgeSum = 0;
+        this.frameSum = 0;
         let i = 0;
         for (let r = -this.rows; r <= this.rows; r++) {
             for (let c = -this.cols; c <= this.cols; c++) {
@@ -45,7 +39,7 @@ module.exports = cc.Class({
         }
     },
 
-    update (dt) {
+    update(dt) {
         this.rotate += dt;
         let angle = (this.rotate * this.rotationSpeed) % 360;
         this.level.rotation = angle;
@@ -76,6 +70,12 @@ module.exports = cc.Class({
                 this.blocks[i].getComponent("animeBlock").bulgeOnce();
             }
         }
+
+        // this.frameSum += dt;
+        // if (this.frameSum > this.rhythm * this.frameBeats) {
+        //     this.frameSum -= this.rhythm * this.frameBeats;
+        //     this.tiktokFrame.getComponent("animeBlock").shadeOnce();
+        // }
     },
 
     tiktok(dir) {

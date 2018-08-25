@@ -1,4 +1,4 @@
-const config = require("./Constants");
+import cfg from "./Constants";
 
 cc.Class({
     extends: cc.Component,
@@ -7,14 +7,14 @@ cc.Class({
     },
 
     onLoad() {
-        cc.debug.setDisplayStats(config.TEST);
+        cc.debug.setDisplayStats(cfg.TEST);
     },
 
     start() {
         cc.director.preloadScene("game");
         this.scheduleOnce(() => {
             cc.director.loadScene("game");
-        }, config.SPLASH_TIME);
+        }, cfg.SPLASH_TIME);
     }
 
 });

@@ -1,6 +1,7 @@
 import sdk from "./sdk/sdk";
 import Arrow from "./Arrow";
 import cfg from "./Constants";
+import BHButton from "./BHButton";
 
 cc.Class({
     extends: cc.Component,
@@ -30,6 +31,8 @@ cc.Class({
         powerUpBoom:          {type: cc.Prefab,  default: null},
         plusOnePrefab:        {type: cc.Prefab,  default: null},
         bgAnime:              {type: cc.Node,  default: null},
+        tiktokFrame:          {type: cc.Node,  default: null},
+        startButton:          {type: BHButton, default: null},
         maxBalls:             1,
         colors:               {type: [cc.color], default: []},
         scoreValue:           0,
@@ -44,6 +47,18 @@ cc.Class({
     },
 
     onLoad() {
+        this.wechatShareProfiles = [
+            {
+                imageUrl: "sdkAssets/longzhu.jpg",
+                query: "",
+                title: "好气，差一点就集齐了，帮帮我！",
+            },
+            {
+                imageUrl: "sdkAssets/share_2.jpg",
+                query: "",
+                title: "小哥哥说，每一颗弹球都是爱我的心跳",
+            },
+        ];
         this.bricksPool = [
             3, 3, 3, 3, 3,
             4, 4, 4, 4, 4, 4, 4, 4,
@@ -57,16 +72,22 @@ cc.Class({
             2, 2, 2
         ];
         this.colors = [
-            new cc.color(241, 196, 15),
-            new cc.color(243, 156, 18),
-            new cc.color(230, 126, 34),
-            new cc.color(211, 84, 0),
-            new cc.color(52, 152, 219),
-            new cc.color(41, 128, 185),
-            new cc.color(155, 89, 182),
-            new cc.color(142, 68, 173),
-            new cc.color(231, 76, 60),
-            new cc.color(192, 57, 43)
+            new cc.color(255, 252, 0),
+            new cc.color(255, 199, 66),
+            new cc.color(237, 154, 24),
+            new cc.color(205, 121, 0),
+            new cc.color(255, 93, 49),
+            new cc.color(255, 72, 102),
+            new cc.color(232, 0, 44),
+            new cc.color(179, 0, 46),
+            new cc.color(255, 136, 255),
+            new cc.color(209, 85, 255),
+            new cc.color(165, 24, 224),
+            new cc.color(172, 0, 209),
+            new cc.color(14, 224, 255),
+            new cc.color(109, 150, 255),
+            new cc.color(101, 26, 255),
+            new cc.color(0, 69, 226),
         ];
         this.leaderboardScores = {
             isContexed: false,
@@ -103,17 +124,34 @@ cc.Class({
         // wechat share
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
             sdk.setShareInfoCallback(() => {
-                return {
-                    imageUrl: "sdkAssets/longzhu.jpg",
-                    query: "",
-                    title: "好气，差一点就集齐了，帮帮我！",
-                };
+                return this.getRandomShareProfile();
             });
         }
     },
 
+    getRandomShareProfile() {
+        return window.getRandomFromArray(this.wechatShareProfiles);
+    },
+
     getLeaderboardData() {
         return sdk.fetchLeaderboardData("score", 0);
+    },
+
+    fetchHighScore() {
+        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+            sdk.fetchLeaderboardData("score", 2).then((res) => {
+                console.log(res);
+                this.startButton.setText("最高分:" + res.toString());
+            }).catch((reason) => {
+                const obj = cc.sys.localStorage.getItem("score");
+                if (obj !== null && obj !== "") {
+                    this.startButton.setText("最高分:" + obj);
+                } else {
+                    this.startButton.setText("最高分:0");
+                }
+                console.warn(reason);
+            });
+        }
     },
 
     findPrefabByName(key) {
@@ -273,17 +311,13 @@ cc.Class({
 
     restart() {
         this.currentLevel = 0;
+        this.player.active = true;
         this.player.getComponent("player").setLengthz(cfg.PLAYER_LENGTH);
         this.loadBestScore();
         this.guide.getComponent("guideBehaviour").phase(1);
         this.gameRunning = true;
         this.gameOver.active = false;
         this.destroyAllLevels();
-        let bullet = this.bullets.pop();
-        while (bullet !== undefined) {
-            this.recyclePrefab(cfg.KEY.BULLET, bullet);
-            bullet = this.bullets.pop();
-        }
         this.player.x = 0;
         this.player.y = -400;
 
@@ -300,6 +334,14 @@ cc.Class({
         this.updateAllStickState();
         this.setScore(0);
         this.frameCounter = 0;
+    },
+
+    recycleAllBullets() {
+        let bullet = this.bullets.pop();
+        while (bullet !== undefined) {
+            this.recyclePrefab(cfg.KEY.BULLET, bullet);
+            bullet = this.bullets.pop();
+        }
     },
 
     setScore(val) {
@@ -343,6 +385,7 @@ cc.Class({
             });
         } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
             console.log("start to upload score");
+            this.startButton.setText("最高分:" + this.memScore.toString());
             sdk.updateLeaderboardScore("score", this.memScore).then(() => {
                 console.log("score uploaded");
             }).catch((reason) => {
@@ -354,16 +397,19 @@ cc.Class({
     },
 
     resetMyScore() {
-        sdk.updateLeaderboardScore("score", 0).then(() => {
-            console.log("score reset");
-        }).catch((reason) => {
-            console.log("score reset failed: " + reason);
-        });
+        if (cfg.TEST) {
+            sdk.updateLeaderboardScore("score", 0).then(() => {
+                console.log("score reset");
+            }).catch((reason) => {
+                console.log("score reset failed: " + reason);
+            });
+        }
     },
 
     gameEnd() {
         if (this.gameRunning === false) return;
         this.guide.active = false;
+        this.recycleAllBullets();
         let level = 1;
         if (typeof (FBInstant) != "undefined") {
             if (this.leaderboardScores.isContexed === false) {
@@ -448,19 +494,20 @@ cc.Class({
     addOneLevel() {
         // move downward
         this.currentLevel += 1;
+        console.log(this.currentLevel);
         let enlarge = false;
-        if (this.currentLevel % 10 === 0) {
+        if (this.currentLevel % cfg.PU_ENLARGE_GAP === 0) {
             enlarge = true;
         }
         let lowest = 1000;
         for (let i = 0; i < this.bricks.length; i++) {
             const element = this.bricks[i];
-            element.runAction(cc.moveBy(0.0, cc.v2(0, -100)));
+            element.runAction(cc.moveBy(0.00, cc.v2(0, -100)));
             if (element.y < lowest) {
                 lowest = element.y
             }
         }
-        if (lowest < -270) {
+        if (lowest < -180) {
             this.gameEnd();
         }
         // add one layer
@@ -474,7 +521,7 @@ cc.Class({
         let alreadyPutBoom = false;
         for (let i = 0; i < powerUp; i++) {
             if (this.currentLevel > 15 && alreadyPutBoom === false) {
-                if (Math.random() < 0.3) {
+                if (Math.random() < cfg.PU_BOOM_PROB) {
                     pool.push(4);
                 } else {
                     pool.push(2);
@@ -491,17 +538,28 @@ cc.Class({
             pool[Math.floor(Math.random() * pool.length)] = 3;
         }
         let doubled = false;
+        let halfed = false;
         for (let i = 0; i < 8; i++) {
             const index = Math.floor(Math.random() * pool.length);
             let brick = null;
             switch (pool[index]) {
                 case 1: {
                     brick = this.instantiatePrefab(cfg.KEY.BRICK, this.levelContainer);
-                    let hp = this.bullets.length + (this.maxBalls - this.bullets.length) * (0.5 + this.currentLevel * 0.01);
+                    let hp = this.bullets.length * 0.75 + (this.maxBalls - this.bullets.length) * (this.currentLevel * 0.005);
                     if (doubled === false) {
                         if (Math.random() < 0.15) {
                             hp *= 2;
                             doubled = true;
+                        }
+                    }
+                    if (doubled === false && halfed === false) {
+                        let halfProb = this.bullets.length / this.maxBalls;
+                        if (halfProb < 0.4) {
+                            halfProb = 0.4;
+                        }
+                        if (Math.random() > halfProb) {
+                            hp *= 0.5;
+                            halfed = true;
                         }
                     }
                     hp = Math.ceil(hp * (1 + Math.random() * 0.6 - 0.3));
@@ -535,6 +593,10 @@ cc.Class({
         }
     },
 
+    start() {
+        this.fetchHighScore();
+    },
+
     update(dt) {
         if (this.touchPressed === true && this.allSticked === true && this.state == "ready") {
             this.arrow.updateArrow(cc.v2(this.player.x, this.player.y), cc.v2(this.touchLoc.x - 360, this.touchLoc.y - 640));
@@ -552,6 +614,8 @@ cc.Class({
             this.tiktokTimer -= dt;
             if (this.tiktokTimer <= 0) {
                 this.tiktok = true;
+                this.tiktokFrame.opacity = 255;
+                this.tiktokFrame.active = true;
                 console.log("tiktok enabled");
             }
         }
@@ -568,9 +632,9 @@ cc.Class({
     touchRelease(e) {
         if (this.allSticked === true && this.state == "ready") {
             const dir = this.arrow.getDirection();
-            dir.normalizeSelf().mulSelf(cfg.BULLET_SPEED);
+            dir.normalizeSelf().mulSelf(cfg.BULLET_SPEED + this.currentLevel * cfg.BULLET_SPEED_INC);
             for (let i = 0; i < this.bullets.length; i++) {
-                this.bullets[i].getComponent("bullet").launchIn(dir.x, dir.y, (i + 1) * 0.1);
+                this.bullets[i].getComponent("bullet").launchIn(dir.x, dir.y, (i + 1) * cfg.BULLET_LAUNCH_INTV);
             }
             this.tiktokTimer = this.tiktokTime;
             this.allSticked = false;
@@ -603,7 +667,13 @@ cc.Class({
                     // notif
                     if (this.tiktok) {
                         console.log("tiktok end");
+                        const fadeout = cc.fadeOut(0.3);
+                        const clearup = cc.callFunc(() => {
+                            this.tiktokFrame.active = false;
+                        })
+                        this.tiktokFrame.runAction(cc.sequence(fadeout, clearup));
                     }
+                    this.tiktokTimer = 0;
                     this.tiktok = false;
                 }
             }

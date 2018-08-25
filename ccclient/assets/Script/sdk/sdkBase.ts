@@ -206,4 +206,11 @@ export default class SDKBase {
     return null
   }
 
+  /**
+   * 获取用户信息
+   */
+  public fetchUserInfo(): Promise<any> {
+    return null
+  }
+
 }

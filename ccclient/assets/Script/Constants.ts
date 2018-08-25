@@ -1,7 +1,9 @@
 export default {
+    BULLET_LAUNCH_INTV: 0.08,
     BULLET_MIN_ANGLE: 0.261799,
     BULLET_PLAYER_OFFSET: 31,
-    BULLET_SPEED: 750,
+    BULLET_SPEED: 660,
+    BULLET_SPEED_INC: 1,
     KEY: {
         BRICK: "BRICK",
         BULLET: "BULLET",
@@ -13,7 +15,7 @@ export default {
     },
     PLAYER_LENGTH: 250,
     PLAYER_LENGTH_MAX: 450,
-    PLAYER_LENGTH_STEP: 20,
+    PLAYER_LENGTH_STEP: 25,
     POOL_SIZES: {
         BRICK: 32,
         BULLET: 20,
@@ -23,6 +25,8 @@ export default {
         PU_ENLARGE: 8,
         SFX_KABOOM: 6,
     },
+    PU_BOOM_PROB: 0.35,
+    PU_ENLARGE_GAP: 8,
     SPLASH_TIME: 2,
     TEST: false,
 };

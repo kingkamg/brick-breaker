@@ -3,13 +3,11 @@ cc.Class({
 
     properties: {
         hp: 1,
-        number: {
-            default: null,
-            type: cc.Label
-        }
+        number: { type: cc.Label, default: null },
+        innerImage: { type: cc.Node, default: null },
     },
 
-    onLoad () {
+    onLoad() {
         this.updateHP();
     },
 
@@ -24,10 +22,13 @@ cc.Class({
         if (index > 0) {
             target = window.controller.colors[index - 1];
         }
-        this.node.color = window.controller.colors[index].lerp(target, ratio);
+        this.innerImage.color = window.controller.colors[index].lerp(target, ratio);
     },
 
     takeHit(ball) {
+        if (window.controller.tiktok) {
+            this.hp -= 1;
+        }
         this.hp -= 1;
         if (this.hp <= 0) {
             this.node.getComponent("brick").kaboom();
