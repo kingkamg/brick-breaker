@@ -2,6 +2,7 @@ import sdk from "./sdk/sdk";
 import Arrow from "./Arrow";
 import cfg from "./Constants";
 import BHButton from "./BHButton";
+import Bullet from "./Bullet";
 
 cc.Class({
     extends: cc.Component,
@@ -10,7 +11,7 @@ cc.Class({
         player:               {type: cc.Node,    default: null},
         canvas:               {type: cc.Node,    default: null},
         arrow:                {type: Arrow,      default: null},
-        bullets:              {type: [cc.Node],  default: []},
+        bullets:              {type: [Bullet],  default: []},
         bricks:               {type: [cc.Node],  default: []},
         walls:                {type: [cc.Node],  default: []},
         levelContainer:       {type: cc.Node,    default: null},
@@ -40,7 +41,7 @@ cc.Class({
         memScore:             0,
         currentLevel:         0,
         frameCounter:         0,
-        fixedFPS:             30,
+        fixedFPS:             50,
         frameCap:             0,
         tiktok:               false,
         tiktokTime:           10,
@@ -111,13 +112,6 @@ cc.Class({
         }
         // Arrow
         this.arrow.init();
-        // physics
-        const physics = cc.director.getPhysicsManager();
-        physics.enabled = true;
-        physics.gravity = cc.v2(0);
-        physics.enabledAccumulator = true;
-        physics.FIXED_TIME_STEP = 1/30;
-        physics.PTM_RATIO = 32;
         // sdk
         sdk.init();
         sdk.onUserNoLogin();
@@ -324,9 +318,9 @@ cc.Class({
         const newBullet = this.instantiatePrefab(cfg.KEY.BULLET, this.canvas);
         newBullet.x = this.player.x;
         newBullet.y = this.player.y + cfg.BULLET_PLAYER_OFFSET;
-        const bulletBehaviour = newBullet.getComponent("bullet");
+        const bulletBehaviour = newBullet.getComponent(Bullet);
         bulletBehaviour.sticked = true;
-        this.bullets.push(newBullet);
+        this.bullets.push(bulletBehaviour);
 
         this.allSticked = true;
         this.state = "ready";
@@ -339,7 +333,7 @@ cc.Class({
     recycleAllBullets() {
         let bullet = this.bullets.pop();
         while (bullet !== undefined) {
-            this.recyclePrefab(cfg.KEY.BULLET, bullet);
+            this.recyclePrefab(cfg.KEY.BULLET, bullet.node);
             bullet = this.bullets.pop();
         }
     },
@@ -351,8 +345,8 @@ cc.Class({
 
     addScore(val) {
         this.scoreValue += val;
-        this.score.string = this.scoreValue + "";
-        this.scoreBuldge = 0.55;
+        // this.score.string = this.scoreValue.toString();
+        // this.scoreBuldge = 0.55;
     },
 
     updateScore() {
@@ -494,7 +488,6 @@ cc.Class({
     addOneLevel() {
         // move downward
         this.currentLevel += 1;
-        console.log(this.currentLevel);
         let enlarge = false;
         if (this.currentLevel % cfg.PU_ENLARGE_GAP === 0) {
             enlarge = true;
@@ -502,12 +495,12 @@ cc.Class({
         let lowest = 1000;
         for (let i = 0; i < this.bricks.length; i++) {
             const element = this.bricks[i];
-            element.runAction(cc.moveBy(0.00, cc.v2(0, -100)));
+            element.y -= 100;
             if (element.y < lowest) {
                 lowest = element.y
             }
         }
-        if (lowest < -180) {
+        if (lowest < -260) {
             this.gameEnd();
         }
         // add one layer
@@ -521,7 +514,11 @@ cc.Class({
         let alreadyPutBoom = false;
         for (let i = 0; i < powerUp; i++) {
             if (this.currentLevel > 15 && alreadyPutBoom === false) {
-                if (Math.random() < cfg.PU_BOOM_PROB) {
+                let boomProb = cfg.PU_BOOM_PROB + this.currentLevel * cfg.PU_BOOM_PROB_DEC;
+                if (boomProb < cfg.PU_BOOM_PROB_MIN) {
+                    boomProb = cfg.PU_BOOM_PROB_MIN;
+                }
+                if (Math.random() < boomProb) {
                     pool.push(4);
                 } else {
                     pool.push(2);
@@ -609,6 +606,10 @@ cc.Class({
             this.score.node.scaleX = this.scoreBuldge + 1;
             this.score.node.scaleY = this.scoreBuldge + 1;
         }
+        // fixed manual frame
+        for (const elem of this.bullets) {
+            elem.updateManually(this.frameCap);
+        }
         // tik tok effect
         if (this.tiktokTimer > 0) {
             this.tiktokTimer -= dt;
@@ -634,7 +635,7 @@ cc.Class({
             const dir = this.arrow.getDirection();
             dir.normalizeSelf().mulSelf(cfg.BULLET_SPEED + this.currentLevel * cfg.BULLET_SPEED_INC);
             for (let i = 0; i < this.bullets.length; i++) {
-                this.bullets[i].getComponent("bullet").launchIn(dir.x, dir.y, (i + 1) * cfg.BULLET_LAUNCH_INTV);
+                this.bullets[i].launchIn(dir.x, dir.y, (i + 1) * cfg.BULLET_LAUNCH_INTV);
             }
             this.tiktokTimer = this.tiktokTime;
             this.allSticked = false;
@@ -655,7 +656,7 @@ cc.Class({
         } else {
             let count = 0;
             for (let i = 0; i < this.bullets.length; i++) {
-                if (this.bullets[i].getComponent("bullet").sticked === true) {
+                if (this.bullets[i].sticked === true) {
                     count += 1;
                 }
             }
@@ -681,3 +682,9 @@ cc.Class({
     },
 
 });
+
+module.exports = {
+    gm: () => {
+        return window.controller;
+    }
+}

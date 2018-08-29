@@ -1,4 +1,5 @@
 import cfg from "./Constants";
+import Bullet from "./Bullet";
 
 cc.Class({
     extends: cc.Component,
@@ -13,10 +14,10 @@ cc.Class({
         const newBullet = window.controller.instantiatePrefab(cfg.KEY.BULLET, window.controller.canvas);
         newBullet.x = this.node.x;
         newBullet.y = this.node.y;
-        newBullet.getComponent(cc.RigidBody).linearVelocity = ball.node.getComponent(cc.RigidBody).linearVelocity.clone();
-        const bulletBehaviour = newBullet.getComponent("bullet");
+        const bulletBehaviour = newBullet.getComponent(Bullet);
+        bulletBehaviour.velocity = ball.velocity.clone();
         bulletBehaviour.sticked = false;
-        window.controller.bullets.push(newBullet);
+        window.controller.bullets.push(bulletBehaviour);
 
         // add max balls
         window.controller.maxBalls ++;

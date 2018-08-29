@@ -1,4 +1,5 @@
 import cfg from "./Constants";
+import Bullet from "./Bullet";
 
 cc.Class({
     extends: cc.Component,
@@ -8,17 +9,17 @@ cc.Class({
     },
 
     kaboom() {
-        // create explosion
-        const explosion = window.controller.instantiatePrefab(cfg.KEY.SFX_KABOOM, window.controller.canvas);
-        const expParticle = explosion.getComponent(cc.ParticleSystem);
-        expParticle.startColor = this.node.color;
-        explosion.x = this.node.x;
-        explosion.y = this.node.y;
-        expParticle.resetSystem();
-        // recycle particles
-        expParticle.scheduleOnce(() => {
-            window.controller.recyclePrefab(cfg.KEY.SFX_KABOOM, explosion);
-        }, expParticle.life);
+        // // create explosion
+        // const explosion = window.controller.instantiatePrefab(cfg.KEY.SFX_KABOOM, window.controller.canvas);
+        // const expParticle = explosion.getComponent(cc.ParticleSystem);
+        // expParticle.startColor = this.node.color;
+        // explosion.x = this.node.x;
+        // explosion.y = this.node.y;
+        // expParticle.resetSystem();
+        // // recycle particles
+        // expParticle.scheduleOnce(() => {
+        //     window.controller.recyclePrefab(cfg.KEY.SFX_KABOOM, explosion);
+        // }, expParticle.life);
 
         // brick action
         const index = window.controller.bricks.indexOf(this.node);
@@ -55,6 +56,6 @@ cc.Class({
             }
         }
         this.node.getComponent(componentName).takeHit(other);
-    }
+    },
 
 });
