@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.16328125,
-      "y": 0.16328125,
+      "x": 0.3784230586902377,
+      "y": 0.3784230586902377,
       "z": 1
     },
     "_quat": {
@@ -7390,7 +7390,7 @@
     "_position": {
       "__type__": "cc.Vec3",
       "x": 307.085,
-      "y": -626,
+      "y": 590,
       "z": 0
     },
     "_scale": {
@@ -7425,8 +7425,8 @@
     "_srcBlendFactor": 1,
     "_dstBlendFactor": 771,
     "_useOriginalSize": true,
-    "_string": "v1.0.1-R19",
-    "_N$string": "v1.0.1-R19",
+    "_string": "v1.0.2-R20",
+    "_N$string": "v1.0.2-R20",
     "_fontSize": 20,
     "_lineHeight": 20,
     "_enableWrapText": true,
@@ -7449,7 +7449,7 @@
     "_enabled": true,
     "alignMode": 1,
     "_target": null,
-    "_alignFlags": 36,
+    "_alignFlags": 32,
     "_left": 0,
     "_right": 4,
     "_top": 0,
