@@ -4,6 +4,16 @@ import cfg from "./Constants";
 import BHButton from "./BHButton";
 import Bullet from "./Bullet";
 
+function getBannerRectWithHeight (maxHeight) {
+  let frameSize = cc.view.getFrameSize()
+  let visibleSize = cc.view.getVisibleSize()
+  let designSize = cc.view.getDesignResolutionSize()
+  let rect = cc.rect(0,0,frameSize.width,0)
+  let height = maxHeight + (visibleSize.height - designSize.height) / 2
+  rect.height = height / designSize.height * frameSize.height
+  return rect
+}
+
 cc.Class({
     extends: cc.Component,
 
@@ -115,6 +125,9 @@ cc.Class({
         // sdk
         sdk.init();
         sdk.onUserNoLogin();
+        if (sdk.supportBannerAd()) {
+          sdk.showBannerAd("GAME_BANNER", getBannerRectWithHeight(200))
+        }
         // wechat share
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
             sdk.setShareInfoCallback(() => {
@@ -345,8 +358,8 @@ cc.Class({
 
     addScore(val) {
         this.scoreValue += val;
-        // this.score.string = this.scoreValue.toString();
-        // this.scoreBuldge = 0.55;
+        this.score.string = this.scoreValue.toString();
+        this.scoreBuldge = 0.55;
     },
 
     updateScore() {
@@ -431,10 +444,13 @@ cc.Class({
             } else {
                 this.leaderboardScores.isContexed = false;
             }
-            if (this.scoreValue < this.leaderboardScores.scores[0].score) {
-                level = 2;
-            } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
-                level = 0;
+
+            if (this.leaderboardScores.scores.length > 0) {
+                if (this.scoreValue < this.leaderboardScores.scores[0].score) {
+                    level = 2;
+                } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
+                    level = 0;
+                }
             }
             if (this.scoreValue < 5) {
                 level = 3;

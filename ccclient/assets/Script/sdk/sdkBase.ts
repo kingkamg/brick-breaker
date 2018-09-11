@@ -31,8 +31,29 @@ export default class SDKBase {
     return false
   }
 
+  // 是否支持更多游戏
+  public supportMoregames (): boolean {
+    return false
+  }
+
+  /**
+   * 支持闪屏
+   * @returns {boolean}
+   */
+  public supportSplash (): boolean {
+    return false
+  }
+
+  /**
+   * 是否支持分享
+   * @returns {boolean}
+   */
+  public supportShare (): boolean {
+    return false
+  }
+
   private _keyDown (event): void {
-    if (event.keyCode === cc.KEY.back) {
+    if (event.keyCode === cc.macro.KEY.back) {
       this.onBackPressed()
     }
   }
@@ -175,7 +196,7 @@ export default class SDKBase {
   }
 
   // 更新玩家排行榜信息
-  public updateRankInfo(data: Object, orderKey: string, isReverse: boolean = false, showInWx: boolean = false) {
+  public updateRankInfo(data: Object, orderKey: string, isReverse: boolean = false, timeMode: number = 0) {
 
   }
 
@@ -213,4 +234,79 @@ export default class SDKBase {
     return null
   }
 
+  public showRanking (type: string, keyList: string[], titles: string[], timeMode: number = 0) {
+
+  }
+
+  public hideRanking () {
+
+  }
+
+  public showMoreGames () {
+
+  }
+
+  /**
+   * 显示广告
+   * @param name 显示广告名称
+   * @param rect 显示广告区域
+   */
+  public showBannerAd (name: string, rect: cc.Rect) {
+
+  }
+
+  /**
+   * 隐藏广告
+   * @param name 隐藏广告名称
+   */
+  public hideBannerAd (name: string) {
+
+  }
+
+  /**
+   * 隐藏所有广告
+   */
+  public hideAllBannerAds () {
+
+  }
+
+  /**
+   * 
+   * @param name         广告标识名称
+   * @param successcall  加载成功回调
+   * @param failcall     加载失败回调
+   */
+  public loadVideoAd (name: string, successcall: Function = null, failcall: Function = null) {
+
+  }
+
+  /**
+   * 
+   * @param successcall  完成成功回调
+   * @param failcall     未完成回调
+   */
+  public showVideoAd (successcall: Function = null, failcall: Function = null) {
+
+  }
+
+  /**
+   * 关闭闪屏
+   * @param {number} keepTime   闪屏持续时长
+   * @param {Function} callback 关闭结束回调
+   */
+  public keepSplash (keepTime: number, callback: Function) {
+
+  }
+
+  /**
+   * 分享
+   * @param {string} title
+   * @param {string} imageUrl
+   * @param {string} [query=null]
+   * @param {Function} [successcall=null]
+   * @param {Function} [failcall=null]
+   */
+  public shareInfo (title: string, imageUrl: string, query: string = null, successcall: Function = null, failcall: Function = null) {
+
+  }
 }
