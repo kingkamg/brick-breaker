@@ -10,6 +10,7 @@ const PostMsgType = {
   HKDone: "HKDone",
   HKShowRank: 'HKshowRank',
   HKGetUserInfo: 'HKGetUserInfo',
+  HKFetchKVData: 'HKFetchKVData',
   HKShowNearbyFriend: 'HKshowNearbyFriend',
   HKShowTopFriend: 'HKshowTopFriend',
 
@@ -33,6 +34,8 @@ const RankType = {
   Self: 2,
 }
 
+const USE_CANVAS_DATA = true
+
 const WXHK = {
   /**
    * 离屏画布的边长，数据最大长度为该值的平方 * 1.5
@@ -46,15 +49,15 @@ const WXHK = {
   idInc: 0,
   renderer: new cc.RenderTexture(),
 }
-const USE_CANVAS_DATA = true
-
-const canvasSize = 50
 
 const BANNERAD_NAME_UNITIDS = {
-  GAME_BANNER: 'adunit-333bfde44fe6c8ce',
+  HOME_BANNER: 'adunit-4a581a001715555b',
+  GAME_BANNER: 'adunit-03ed591802649b7d',
 }
 
 const VIDEOAD_NAME_UNITIDS = {
+  RELIFE_VIDEO: 'adunit-a4bcd72aeeb06726',
+  ADCOIN_VIDEO: 'adunit-1a8477bff34c112e',
 }
 
 var sdkWechat = cc.Class({
@@ -134,13 +137,15 @@ var sdkWechat = cc.Class({
     try {
       let obj = JSON.parse(stringBuffer)
       if (obj.status === 200) {
-        console.log("wxhk: resolve 成功返回数据, msgId", task.id)
+        console.log("wxhk: resolve, msgId", task.id)
         task.resolve(obj.data)
       } else {
-        task.reject("wxhk: reject 读画布成功 msgId", task.id, "但是wx接口获取数据失败，原因: " + obj.reason)
+        console.log("wxhk: reject. MsgId", task.id, "wx API failed")
+        task.reject("wxhk: reject. Read canvas success msgId " + task.id + ". But wx API failed, reason: " + obj.reason)
       }
     } catch(e) {
-      task.reject("wxhk: reject 数据损坏 msgId", task.id, "结果", stringBuffer)
+      console.log("wxhk: reject. MsgId", task.id, " Data corrupted")
+      task.reject("wxhk: reject data corrupted msgId " + task.id + ". Result " + stringBuffer)
     }
     wx.getOpenDataContext().postMessage({
       msgType: PostMsgType.HKDone,
@@ -281,13 +286,9 @@ var sdkWechat = cc.Class({
     // check update
     this._checkUpdate()
 
+    // 每0.1秒获取离屏canvas数据（如果有任务）
     if (USE_CANVAS_DATA) {
-      // 每0.1秒获取离屏canvas数据（如果有任务）
-      this.wxhkTaskID = 0
-      this.renderTexture = new cc.RenderTexture()
-      this.wxhkResolver = null
-      this.wxhkRejector = null
-      setInterval(this._checkSharedCanvas.bind(this), 100)
+      setInterval(this._checkSharedCanvas.bind(this), WXHK.tick)
     }
   },
 
@@ -393,9 +394,11 @@ var sdkWechat = cc.Class({
 
   /**
    * 更新玩家在排行榜上的分数
+   * @override
+   * @deprecated 使用 updateUserCloudStorage(key: string, value: string): Promise<void>
    * @param {string} whichBoard 排行榜名称，KVData里面的Key
    * @param {number} score 玩家分数，注意，该方法不判断“低分不能覆盖高分”的逻辑
-   * @override
+   * @returns {Promise<void>}
    */
   updateLeaderboardScore(whichBoard, score) {
     return new Promise((resolve, reject) => {
@@ -420,12 +423,15 @@ var sdkWechat = cc.Class({
 
   /**
    * 获取排行榜数据
+   * @override
+   * @deprecated 使用 fetchUserCloudStorage(key: string): Promise<string>
    * @param {string} whichBoard 排行榜名称，KVData里面的Key
    * @param {RankType} rankType 排行榜类型
-   * @override
+   * @returns {Promise<any>}
    */
   fetchLeaderboardData(whichBoard, rankType) {
     WXHK.idInc ++
+    console.log("wxhk: new task, type=HKShowRank id=" + WXHK.idInc)
     wx.getOpenDataContext().postMessage({
       msgType: PostMsgType.HKShowRank,
       msgId: WXHK.idInc,
@@ -445,8 +451,61 @@ var sdkWechat = cc.Class({
     })
   },
 
+  /**
+   * 更新玩家的云存储数据
+   * @param {string} dataKey KVData里面的Key
+   * @param {string} dataValue KVData里面的value
+   * @returns {Promise<void>}
+   * @override
+   */
+  updateUserCloudStorage(dataKey, dataValue) {
+    return new Promise((resolve, reject) => {
+      wx.setUserCloudStorage({
+        KVDataList: [{
+          key: dataKey,
+          value: dataValue,
+        }],
+        success: () => resolve(),
+        fail: () => reject("wx.setUserCloudStorage failed @ updateUserCloudStorage")
+      })
+    })
+  },
+
+  /**
+   * 获取玩家的云存储数据
+   * @param {string} dataKey KVData里面的Key
+   * @returns {Promise<string>}
+   * @override
+   */
+  fetchUserCloudStorage(dataKey) {
+    WXHK.idInc ++
+    console.log("wxhk: new task, type=HKFetchKVData id=" + WXHK.idInc)
+    wx.getOpenDataContext().postMessage({
+      msgType: PostMsgType.HKFetchKVData,
+      msgId: WXHK.idInc,
+      data: {
+        params: {
+          keyList: [dataKey],
+        }
+      }
+    })
+    return new Promise((resolve, reject) => {
+      WXHK.tasks.push({
+        id: WXHK.idInc,
+        resolve: resolve,
+        reject: reject,
+      })
+    })
+  },
+
+  /**
+   * 获取本地用户信息
+   * @returns {Promise}
+   * @override
+   */
   fetchUserInfo() {
     WXHK.idInc ++
+    console.log("wxhk: new task, type=HKGetUserInfo id=" + WXHK.idInc)
     wx.getOpenDataContext().postMessage({
       msgType: PostMsgType.HKGetUserInfo,
       msgId: WXHK.idInc,
