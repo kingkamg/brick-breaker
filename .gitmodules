@@ -1,0 +1,3 @@
+[submodule "build-templates"]
+	path = build-templates
+	url = git@sagi.vr-cat.com:share/build-templates.git
