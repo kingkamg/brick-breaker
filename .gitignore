@@ -66,6 +66,9 @@ quick_gen_project_*_autogen.sh.meta
 
 .vscode/
 
-design
 store_files
+design
 node_modules
+assets/Script/sdk
+settings
+assets/resources/version.json*

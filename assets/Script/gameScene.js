@@ -1,7 +1,7 @@
 import LoginUIAnime from "./LoginUIAnime";
-import cfg from "./Constants";
 import MToggle from "./MToggle";
 const leaderboardBehaviour = require("./leaderboard");
+const getBannerRectWithHeight = require("./interaction").getBannerRectWithHeight
 
 cc.Class({
     extends: cc.Component,
@@ -26,6 +26,9 @@ cc.Class({
         this.loginUI.show(false);
         this.gameUINode.active = true;
         window.controller.restart();
+        if (sdk.supportBannerAd()) {
+            sdk.showBannerAd("GAME_BANNER", getBannerRectWithHeight(200))
+        }
     },
 
     onClickedLeaderboard() {
@@ -58,6 +61,9 @@ cc.Class({
         window.controller.player.active = false;
         window.controller.recycleAllBullets();
         window.controller.gameRunning = false;
+        if (sdk.supportBannerAd()) {
+          sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+        }
     },
 
     onClickedToggleSound() {

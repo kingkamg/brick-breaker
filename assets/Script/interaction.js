@@ -126,7 +126,7 @@ cc.Class({
         sdk.init();
         sdk.onUserNoLogin();
         if (sdk.supportBannerAd()) {
-          sdk.showBannerAd("GAME_BANNER", getBannerRectWithHeight(200))
+          sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
         }
         // wechat share
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
@@ -702,5 +702,6 @@ cc.Class({
 module.exports = {
     gm: () => {
         return window.controller;
-    }
+    },
+    getBannerRectWithHeight,
 }

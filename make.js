@@ -61,9 +61,9 @@ const procedureCopyProjectJson = () => {
     console.log(chalk.green("[start]"), "copy project.json");
     const fpProjectJson = path.join("settings", "project.json");
     if (program.platform === "wechat") {
-        funcs.copyFileSync(path.join("make", "project_wechat.json"), fpProjectJson);
+        funcs.copyFileSync(path.join("buildfiles", "project_wechat.json"), fpProjectJson);
     } else if (program.platform === "android") {
-        funcs.copyFileSync(path.join("make", "project_android.json"), fpProjectJson);
+        funcs.copyFileSync(path.join("buildfiles", "project_android.json"), fpProjectJson);
     }
     console.log(chalk.green("[success]"), "copy project.json");
 };
@@ -153,70 +153,12 @@ const procedureSubPackage = () => {
     // subpackage
     console.log(chalk.green("[start]"), "subpackage");
     const gamejs = path.join("build", "wechatgame", "game.js");
-    const data = Buffer.from(fs.readFileSync(gamejs).toString().replace("window.boot();", ""), "utf8");
+    const data = fs.readFileSync(gamejs);
     const fd = fs.openSync(gamejs, "w+");
     const buffer1 = new Buffer(`
 require("utils/ald-game.js");
 `);
-    const buffer2 = new Buffer(`
-wx.showLoading({
-    title: "加载中",
-    mask: true,
-});
-
-function tryLoadSubpackage() {
-    const loadTask = wx.loadSubpackage({
-        name: 'stage1',
-        success: function (res) {
-            console.log("subpackage api success", res)
-        },
-        fail: function (res) {
-            console.warn("subpackage api fail", res)
-            setTimeout(() => {
-                throw new Error("subpackage api fail " + res.toString());
-            }, 10);
-        },
-        complete: function (res) {
-            console.log("subpackage api complete", res)
-            wx.hideLoading();
-            if (window.SUBPACKAGE_RAW_ASSETS) {
-                console.log("subpackage logic success")
-                window.boot();
-            } else {
-                console.warn("subpackage logic fail")
-                setTimeout(() => {
-                    throw new Error("subpackage logic fail " + res.toString());
-                }, 10);
-                wx.showModal({
-                    title: "开小差啦",
-                    content: "当前网络不稳定，请检查网络并重新加载",
-                    showCancel: false,
-                    success: function () {
-                        tryLoadSubpackage()
-                    }
-                });
-            }
-        }
-    });
-
-    loadTask.onProgressUpdate(res => {
-        console.log('下载进度', res.progress)
-        console.log('已经下载的数据长度', res.totalBytesWritten)
-        console.log('预期需要下载的数据总长度', res.totalBytesExpectedToWrite)
-        if (res.progress >= 0 && res.progress <= 1) {
-            wx.showLoading({
-                title: "加载中(" + (res.progress * 100).toFixed(0) + "%)",
-            })
-        } else {
-            wx.showLoading({
-                title: "加载中(...)",
-            })
-        }
-    })
-}
-
-tryLoadSubpackage();
-`);
+    const buffer2 = new Buffer("");
     fs.writeSync(fd, buffer1, 0, buffer1.length, 0);
     fs.writeSync(fd, data, 0, data.length, buffer1.length);
     fs.writeSync(fd, buffer2, 0, buffer2.length, buffer1.length + data.length);
@@ -231,7 +173,7 @@ const procedureUploadToWxdevtools = () => {
         if (program.upload) {
             const wxVName = gVersionName;
             const wxDesc = ` v${gVersionName}-R${gBuildNumber}`;
-            const execCmd = `D:\\Application\\wx-dev\\cli.bat -u ${wxVName}@D:\\Projects\\blackhole-battle\\build\\wechatgame --upload-desc ${wxDesc}`;
+            const execCmd = `D:\\Application\\wx-dev\\cli.bat -u ${wxVName}@D:\\Projects\\brick-breaker\\build\\wechatgame --upload-desc ${wxDesc}`;
             child.exec(execCmd, (err, stdout, stderr) => {
                 if (err) {
                     console.log(err);
