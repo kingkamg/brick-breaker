@@ -1,3 +1,0 @@
-[submodule "ccclient/build-templates"]
-	path = ccclient/build-templates
-	url = https://sagi.vr-cat.com/gitlab/share/build-templates.git
