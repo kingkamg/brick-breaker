@@ -72,15 +72,17 @@ cc.Class({
         window.controller.recycleAllBullets();
         window.controller.gameRunning = false;
         if (sdk.supportBannerAd()) {
-            if (cc.sys.platform === cc.sys.WECHAT_GAME && this.adcdTimer <= 0) {
-                const info = wx.getSystemInfoSync()
-                if (info.model.indexOf("iPhone 5") === -1 && info.model.indexOf("iPhone SE") === -1) {
-                    sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+            if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+                if (this.adcdTimer <= 0) {
+                    const info = wx.getSystemInfoSync()
+                    if (info.model.indexOf("iPhone 5") === -1 && info.model.indexOf("iPhone SE") === -1) {
+                        sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+                    }
+                    this.adcdTimer = 60;
                 }
             } else {
                 sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
             }
-            this.adcdTimer = 60;
         }
     },
 
