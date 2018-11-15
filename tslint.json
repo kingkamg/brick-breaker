@@ -9,5 +9,10 @@
         "max-line-length": false,
         "no-console": {"severity": "warn"}
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "linterOptions": {
+        "exclude": [
+            "build-templates/**"
+        ]
+    }
 }

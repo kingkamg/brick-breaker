@@ -4,57 +4,57 @@ import cfg from "./Constants";
 import BHButton from "./BHButton";
 import Bullet from "./Bullet";
 
-function getBannerRectWithHeight (maxHeight) {
-  let frameSize = cc.view.getFrameSize()
-  let visibleSize = cc.view.getVisibleSize()
-  let designSize = cc.view.getDesignResolutionSize()
-  let rect = cc.rect(0,0,frameSize.width,0)
-  let height = maxHeight + (visibleSize.height - designSize.height) / 2
-  rect.height = height / designSize.height * frameSize.height
-  return rect
+function getBannerRectWithHeight(maxHeight) {
+    let frameSize = cc.view.getFrameSize()
+    let visibleSize = cc.view.getVisibleSize()
+    let designSize = cc.view.getDesignResolutionSize()
+    let rect = cc.rect(0, 0, frameSize.width, 0)
+    let height = maxHeight + (visibleSize.height - designSize.height) / 2
+    rect.height = height / designSize.height * frameSize.height
+    return rect
 }
 
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        player:               {type: cc.Node,    default: null},
-        canvas:               {type: cc.Node,    default: null},
-        arrow:                {type: Arrow,      default: null},
-        bullets:              {type: [Bullet],  default: []},
-        bricks:               {type: [cc.Node],  default: []},
-        walls:                {type: [cc.Node],  default: []},
-        levelContainer:       {type: cc.Node,    default: null},
-        score:                {type: cc.Label,   default: null},
-        scoreBuldge:          0,
-        bestScore:            {type: cc.Label,   default: null},
-        gameOver:             {type: cc.Node,    default: null},
-        guide:                {type: cc.Node,    default: null},
-        state:                "ready", // ready, moving
-        allSticked:           true,
-        touchPressed:         false,
-        touchLoc:             null,
-        bulletPrefab:         {type: cc.Prefab,  default: null},
-        sfxKaboomPrefab:      {type: cc.Prefab,  default: null},
-        brickPrefab:          {type: cc.Prefab,  default: null},
-        powerUpBallsPrefab:   {type: cc.Prefab,  default: null},
-        powerUpEnlargePrefab: {type: cc.Prefab,  default: null},
-        powerUpBoom:          {type: cc.Prefab,  default: null},
-        plusOnePrefab:        {type: cc.Prefab,  default: null},
-        bgAnime:              {type: cc.Node,  default: null},
-        tiktokFrame:          {type: cc.Node,  default: null},
-        startButton:          {type: BHButton, default: null},
-        maxBalls:             1,
-        colors:               {type: [cc.color], default: []},
-        scoreValue:           0,
-        gameRunning:          false,
-        memScore:             0,
-        currentLevel:         0,
-        frameCounter:         0,
-        fixedFPS:             50,
-        frameCap:             0,
-        tiktok:               false,
-        tiktokTime:           10,
+        player: { type: cc.Node, default: null },
+        canvas: { type: cc.Node, default: null },
+        arrow: { type: Arrow, default: null },
+        bullets: { type: [Bullet], default: [] },
+        bricks: { type: [cc.Node], default: [] },
+        walls: { type: [cc.Node], default: [] },
+        levelContainer: { type: cc.Node, default: null },
+        score: { type: cc.Label, default: null },
+        scoreBuldge: 0,
+        bestScore: { type: cc.Label, default: null },
+        gameOver: { type: cc.Node, default: null },
+        guide: { type: cc.Node, default: null },
+        state: "ready", // ready, moving
+        allSticked: true,
+        touchPressed: false,
+        touchLoc: null,
+        bulletPrefab: { type: cc.Prefab, default: null },
+        sfxKaboomPrefab: { type: cc.Prefab, default: null },
+        brickPrefab: { type: cc.Prefab, default: null },
+        powerUpBallsPrefab: { type: cc.Prefab, default: null },
+        powerUpEnlargePrefab: { type: cc.Prefab, default: null },
+        powerUpBoom: { type: cc.Prefab, default: null },
+        plusOnePrefab: { type: cc.Prefab, default: null },
+        bgAnime: { type: cc.Node, default: null },
+        tiktokFrame: { type: cc.Node, default: null },
+        startButton: { type: BHButton, default: null },
+        maxBalls: 1,
+        colors: { type: [cc.color], default: [] },
+        scoreValue: 0,
+        gameRunning: false,
+        memScore: 0,
+        currentLevel: 0,
+        frameCounter: 0,
+        fixedFPS: 50,
+        frameCap: 0,
+        tiktok: false,
+        tiktokTime: 10,
     },
 
     onLoad() {
@@ -126,7 +126,14 @@ cc.Class({
         sdk.init();
         sdk.onUserNoLogin();
         if (sdk.supportBannerAd()) {
-          sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+            if (cc.sys.platform === cc.sys.WECHAT_GAME) {
+                const info = wx.getSystemInfoSync()
+                if (info.model.indexOf("iPhone 5") === -1 && info.model.indexOf("iPhone SE") === -1) {
+                    sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+                }
+            } else {
+                sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+            }
         }
         // wechat share
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
@@ -475,7 +482,7 @@ cc.Class({
 
     destroyAllLevels() {
         let i = this.bricks.length;
-        while (i --) {
+        while (i--) {
             this.bricks[i].getComponent("brick").kaboom();
         }
     },
@@ -489,7 +496,7 @@ cc.Class({
             }
         }
         let i = this.bricks.length;
-        while (i --) {
+        while (i--) {
             const element = this.bricks[i];
             if (Math.abs(element.y - lowest) < 10) {
                 const brickBehav = element.getComponent("brick");

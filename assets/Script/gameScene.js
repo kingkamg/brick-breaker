@@ -7,15 +7,25 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        loginUI:     {type: LoginUIAnime, default: null},
-        gameUINode:  {type: cc.Node, default: null},
-        leaderboard: {type: leaderboardBehaviour, default: null},
-        bgm: {type: cc.AudioSource, default: null},
-        muteToggle: {type: MToggle, default: null},
+        loginUI: { type: LoginUIAnime, default: null },
+        gameUINode: { type: cc.Node, default: null },
+        leaderboard: { type: leaderboardBehaviour, default: null },
+        bgm: { type: cc.AudioSource, default: null },
+        muteToggle: { type: MToggle, default: null },
+        versionLabel: { type: cc.Label, default: null },
+        adcdTimer: 0
     },
 
     onLoad() {
         this.bgmPlaying = true;
+        cc.loader.loadRes("version", (err, jsonAsset) => {
+            console.log(jsonAsset.json)
+            this.versionLabel.string = `v${jsonAsset.json.version}-R${jsonAsset.json.build}`
+        });
+    },
+
+    update(dt) {
+        this.adcdTimer -= dt;
     },
 
     onRestartClicked() {
@@ -27,7 +37,7 @@ cc.Class({
         this.gameUINode.active = true;
         window.controller.restart();
         if (sdk.supportBannerAd()) {
-            sdk.showBannerAd("GAME_BANNER", getBannerRectWithHeight(200))
+            sdk.hideBannerAd("HOME_BANNER")
         }
     },
 
@@ -62,7 +72,15 @@ cc.Class({
         window.controller.recycleAllBullets();
         window.controller.gameRunning = false;
         if (sdk.supportBannerAd()) {
-          sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+            if (cc.sys.platform === cc.sys.WECHAT_GAME && this.adcdTimer <= 0) {
+                const info = wx.getSystemInfoSync()
+                if (info.model.indexOf("iPhone 5") === -1 && info.model.indexOf("iPhone SE") === -1) {
+                    sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+                }
+            } else {
+                sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
+            }
+            this.adcdTimer = 60;
         }
     },
 
