@@ -7,12 +7,12 @@
     "rules": {
         "no-unused-variable": {"severity": "warn"},
         "max-line-length": false,
-        "no-console": {"severity": "warn"}
+        "no-console": [true, "log"]
     },
     "rulesDirectory": [],
     "linterOptions": {
         "exclude": [
-            "build-templates/**"
+            "assets/Script/sdk/*"
         ]
     }
 }

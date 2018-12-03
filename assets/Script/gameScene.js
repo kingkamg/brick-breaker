@@ -1,7 +1,7 @@
 import LoginUIAnime from "./LoginUIAnime";
 import MToggle from "./MToggle";
+import Utils from "./Utils";
 const leaderboardBehaviour = require("./leaderboard");
-const getBannerRectWithHeight = require("./interaction").getBannerRectWithHeight
 
 cc.Class({
     extends: cc.Component,
@@ -37,7 +37,8 @@ cc.Class({
         this.gameUINode.active = true;
         window.controller.restart();
         if (sdk.supportBannerAd()) {
-            sdk.hideBannerAd("HOME_BANNER")
+            Utils.hideBannerAd("HOME_BANNER");
+            Utils.showBannerAd("GAME_BANNER");
         }
     },
 
@@ -72,17 +73,8 @@ cc.Class({
         window.controller.recycleAllBullets();
         window.controller.gameRunning = false;
         if (sdk.supportBannerAd()) {
-            if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-                if (this.adcdTimer <= 0) {
-                    const info = wx.getSystemInfoSync()
-                    if (info.model.indexOf("iPhone 5") === -1 && info.model.indexOf("iPhone SE") === -1) {
-                        sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
-                    }
-                    this.adcdTimer = 60;
-                }
-            } else {
-                sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
-            }
+            Utils.hideBannerAd("GAME_BANNER");
+            Utils.showBannerAd("HOME_BANNER");
         }
     },
 

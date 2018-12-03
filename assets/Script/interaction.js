@@ -3,16 +3,7 @@ import Arrow from "./Arrow";
 import cfg from "./Constants";
 import BHButton from "./BHButton";
 import Bullet from "./Bullet";
-
-function getBannerRectWithHeight(maxHeight) {
-    let frameSize = cc.view.getFrameSize()
-    let visibleSize = cc.view.getVisibleSize()
-    let designSize = cc.view.getDesignResolutionSize()
-    let rect = cc.rect(0, 0, frameSize.width, 0)
-    let height = maxHeight + (visibleSize.height - designSize.height) / 2
-    rect.height = height / designSize.height * frameSize.height
-    return rect
-}
+import Utils from "./Utils";
 
 cc.Class({
     extends: cc.Component,
@@ -100,10 +91,6 @@ cc.Class({
             new cc.color(101, 26, 255),
             new cc.color(0, 69, 226),
         ];
-        this.leaderboardScores = {
-            isContexed: false,
-            scores: []
-        };
         this.frameCap = 1 / this.fixedFPS;
 
         this.node.on(cc.Node.EventType.TOUCH_START, this.onDragged.bind(this));
@@ -123,17 +110,13 @@ cc.Class({
         // Arrow
         this.arrow.init();
         // sdk
-        sdk.init();
+        sdk.setOpenKeys(["score"]);
+        sdk.initWithGameId(51);
+        const utm = sdk.onCollectionTraffic();
+        console.log("traffic info", utm);
         sdk.onUserNoLogin();
         if (sdk.supportBannerAd()) {
-            if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-                const info = wx.getSystemInfoSync()
-                if (info.model.indexOf("iPhone 5") === -1 && info.model.indexOf("iPhone SE") === -1) {
-                    sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
-                }
-            } else {
-                sdk.showBannerAd("HOME_BANNER", getBannerRectWithHeight(200))
-            }
+            Utils.showBannerAd("HOME_BANNER");
         }
         // wechat share
         if (cc.sys.platform === cc.sys.WECHAT_GAME) {
@@ -147,24 +130,13 @@ cc.Class({
         return window.getRandomFromArray(this.wechatShareProfiles);
     },
 
-    getLeaderboardData() {
-        return sdk.fetchLeaderboardData("score", 0);
-    },
-
     fetchHighScore() {
-        if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-            sdk.fetchLeaderboardData("score", 2).then((res) => {
-                console.log(res);
-                this.startButton.setText("最高分:" + res.toString());
-            }).catch((reason) => {
-                const obj = cc.sys.localStorage.getItem("score");
-                if (obj !== null && obj !== "") {
-                    this.startButton.setText("最高分:" + obj);
-                } else {
-                    this.startButton.setText("最高分:0");
-                }
-                console.warn(reason);
-            });
+        const data = sdk.getUserStorage("score");
+		console.log("​fetchHighScore -> data", data)
+        if (Utils.isWXGameScoreData(data)) {
+            this.startButton.setText("最高分:" + data.wxgame.score.toString());
+        } else {
+            this.startButton.setText("最高分:0");
         }
     },
 
@@ -226,101 +198,14 @@ cc.Class({
         this.nodePools[prefabName].put(obj);
     },
 
-    loadLeaderboardScores() {
-        if (typeof (FBInstant) != "undefined") {
-            console.log(`current context = ${FBInstant.context.getID()}`);
-            let leaderboardPromise;
-            if (FBInstant.context.getID() == null) {
-                leaderboardPromise = FBInstant.getLeaderboardAsync("global_highscore");
-            } else {
-                leaderboardPromise = FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`);
-                this.leaderboardScores.isContexed = true;
-            }
-            leaderboardPromise.then((leaderboard) => {
-                console.log(`get all scores, getLeaderboardAsync OK`);
-                leaderboard.getEntriesAsync(10, 0).then((entries) => {
-                    console.log("get all scores, getEntriesAsync OK", entries);
-                    this.leaderboardScores.scores = [];
-                    for (let i = 0; i < entries.length; i++) {
-                        this.leaderboardScores.scores.push({
-                            score: entries[i].getScore()
-                        });
-                    }
-                }, (rejected) => {
-                    console.log(rejected);
-                });
-            }, (rejected) => {
-                console.log(rejected);
-            });
-        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-            sdk.fetchLeaderboardData("score", 0).then((data) => {
-                console.log("load game received data");
-                console.log(data);
-                this.leaderboardScores.scores = [];
-                for (const elem of data) {
-                    this.leaderboardScores.scores.push({
-                        score: parseInt(JSON.parse(elem.KVDataList[0].value).wxgame.score, 10),
-                    });
-                }
-                this.leaderboardScores.scores.sort((a, b) => {
-                    if (a.score > b.score) {
-                        return -1;
-                    } else if (a.score < b.score) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                });
-            }).catch((reason) => {
-                console.log(">>>>>> promise rejected " + reason);
-            });
-        }
-        console.log(this.leaderboardScores);
-    },
-
     loadBestScore() {
-        if (typeof (FBInstant) != "undefined") {
-            console.log(`current context = ${FBInstant.context.getID()}`);
-            let leaderboardPromise;
-            if (FBInstant.context.getID() == null) {
-                leaderboardPromise = FBInstant.getLeaderboardAsync("global_highscore");
-            } else {
-                leaderboardPromise = FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`);
-            }
-            leaderboardPromise.then((leaderboard) => {
-                console.log(`get best, getLeaderboardAsync OK`);
-                leaderboard.getPlayerEntryAsync().then((entry) => {
-                    console.log("get best, getPlayerEntryAsync OK", entry);
-                    if (entry !== null) {
-                        this.bestScore.string = "" + entry.getScore();
-                    }
-                }, (rejected) => {
-                    console.log(rejected);
-                });
-            }, (rejected) => {
-                console.log(rejected);
-            });
-            this.loadLeaderboardScores();
-        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-            sdk.fetchLeaderboardData("score", 2).then((data) => {
-                console.log("wx fetch user data success");
-                this.bestScore.string = data.toString();
-                this.memScore = data;
-                this.loadLeaderboardScores();
-            }).catch((reason) => {
-                console.log("wx loadBestScore failed, reason: " + reason);
-                this.loadLeaderboardScores();
-            });
+        const data = sdk.getUserStorage("score")
+        if (Utils.isWXGameScoreData(data)) {
+            this.memScore = data.wxgame.score;
         } else {
-            let score = cc.sys.localStorage.getItem("score");
-            if (score !== null && score !== "") {
-                this.bestScore.string = score;
-                this.memScore = parseInt(score, 10);
-            } else {
-                this.bestScore.string = "0";
-            }
-            this.loadLeaderboardScores();
+            this.memScore = 0;
         }
+        this.bestScore.string = this.memScore.toFixed(0);
     },
 
     restart() {
@@ -369,53 +254,13 @@ cc.Class({
         this.scoreBuldge = 0.55;
     },
 
-    updateScore() {
-        if (this.scoreValue > parseInt(this.bestScore.string)) {
-            this.bestScore.string = "" + this.scoreValue;
-        }
-        if (typeof (FBInstant) != "undefined") {
-            console.log(`current context = ${FBInstant.context.getID()}`);
-            let leaderboardPromise;
-            if (FBInstant.context.getID() == null) {
-                leaderboardPromise = FBInstant.getLeaderboardAsync("global_highscore");
-            } else {
-                leaderboardPromise = FBInstant.getLeaderboardAsync(`highscore.${FBInstant.context.getID()}`);
-            }
-            leaderboardPromise.then((leaderboard) => {
-                console.log("update score, getLeaderboardAsync OK");
-                leaderboard.getPlayerEntryAsync().then((entry) => {
-                    console.log("update score, getPlayerEntryAsync OK");
-                    leaderboard.setScoreAsync(this.scoreValue).then(() => {
-                        console.log("update score, setScoreAsync OK");
-                        console.log(`${highscore} score saved ${this.scoreValue}`);
-                    }, (rejected) => {
-                        console.log(rejected);
-                    });
-                }, (rejected) => {
-                    console.log(rejected);
-                });
-            }, (rejected) => {
-                console.log(rejected);
-            });
-        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-            console.log("start to upload score");
-            this.startButton.setText("最高分:" + this.memScore.toString());
-            sdk.updateLeaderboardScore("score", this.memScore).then(() => {
-                console.log("score uploaded");
-            }).catch((reason) => {
-                console.log("score upload failed: " + reason);
-            });
-        } else {
-            cc.sys.localStorage.setItem("score", this.memScore.toString());
-        }
-    },
-
     resetMyScore() {
         if (cfg.TEST) {
-            sdk.updateLeaderboardScore("score", 0).then(() => {
-                console.log("score reset");
-            }).catch((reason) => {
-                console.log("score reset failed: " + reason);
+            sdk.setUserStorage("score", {
+                wxgame: {
+                    score: 0,
+                    update_time: new Date().valueOf(),
+                },
             });
         }
     },
@@ -425,59 +270,23 @@ cc.Class({
         this.guide.active = false;
         this.recycleAllBullets();
         let level = 1;
-        if (typeof (FBInstant) != "undefined") {
-            if (this.leaderboardScores.isContexed === false) {
-                if (this.scoreValue <= parseInt(this.bestScore.string)) {
-                    level = 2;
-                }
-                if (this.scoreValue < 5) {
-                    level = 3;
-                }
-            } else {
-                if (this.leaderboardScores.scores.length > 0) {
-                    if (this.scoreValue < this.leaderboardScores.scores[0].score) {
-                        level = 2;
-                    } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
-                        level = 0;
-                    }
-                    if (this.scoreValue < 5) {
-                        level = 3;
-                    }
-                }
-            }
-        } else if (cc.sys.platform === cc.sys.WECHAT_GAME) {
-            if (this.leaderboardScores.scores.length > 1) {
-                this.leaderboardScores.isContexed = true;
-            } else {
-                this.leaderboardScores.isContexed = false;
-            }
-
-            if (this.leaderboardScores.scores.length > 0) {
-                if (this.scoreValue < this.leaderboardScores.scores[0].score) {
-                    level = 2;
-                } else if (this.scoreValue > this.leaderboardScores.scores[0].score * 2) {
-                    level = 0;
-                }
-            }
-            if (this.scoreValue < 5) {
-                level = 3;
-            }
-            if (this.memScore < this.scoreValue) {
-                this.memScore = this.scoreValue;
-            }
-        } else {
-            if (this.scoreValue <= this.memScore) {
-                level = 2;
-            }
-            if (this.scoreValue < 5) {
-                level = 3;
-            }
-            if (this.memScore < this.scoreValue) {
-                this.memScore = this.scoreValue;
-            }
+        if (this.scoreValue <= this.memScore) {
+            level = 2;
         }
-        this.gameOver.getComponent("gameOverBehaviour").show(this.leaderboardScores.isContexed, level);
-        this.updateScore();
+        if (this.scoreValue < 5) {
+            level = 3;
+        }
+        if (this.memScore < this.scoreValue) {
+            this.memScore = this.scoreValue;
+            sdk.setUserStorage("score", {
+                wxgame: {
+                    score: this.memScore,
+                    update_time: new Date().valueOf(),
+                },
+            });
+            this.fetchHighScore();
+        }
+        this.gameOver.getComponent("gameOverBehaviour").show(false, level);
     },
 
     destroyAllLevels() {
@@ -709,6 +518,5 @@ cc.Class({
 module.exports = {
     gm: () => {
         return window.controller;
-    },
-    getBannerRectWithHeight,
+    }
 }
